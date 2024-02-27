@@ -11,14 +11,6 @@ import { initializeApp } from "firebase/app";
 import { onBeforeMount } from "vue";
 import router from "@/router/index.js";
 
-router.beforeEach((to, from, next) => {
-  const user = useAuthenticatorStore().user
-  if (!user && to.name !== 'login') {
-    next({name: 'login'})
-  }
-  next()
-})
-
 onBeforeMount(() => {
   const firebaseConfig = {
     apiKey: "AIzaSyD81g-c9f8yiDbC_atW-Pvp_MP7t_aTjKQ",
@@ -30,10 +22,10 @@ onBeforeMount(() => {
     measurementId: "G-W5TJ6PV4GV"
   };
   initializeApp(firebaseConfig);
-  const user = useAuthenticatorStore().user
+  const authStore = useAuthenticatorStore()
 
-  if (!user) {
-    useAuthenticatorStore().init()
+  if (!authStore.user) {
+    router.push('/login')
   }
 })
 </script>

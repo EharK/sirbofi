@@ -13,35 +13,39 @@ import {computed, ref} from "vue";
 export const useAuthenticatorStore
     = defineStore(
     'AuthenticatorStore',
-    {
-        state: () => ({
-            user: ref(null),
-            error: ref(null)
-        }),
-        getters: {
-            isAuthenticated: computed(() => this.user !== null)
-        },
-        actions: {
-            async login(email, password) {
-                const auth = getAuth()
-                try {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password)
-                    this.user = userCredential.user
-                } catch (e) {
-                    this.error = e
-                }
-            },
-            async init() {
-                const auth = getAuth()
-                await setPersistence(auth, browserSessionPersistence)
-                onAuthStateChanged(auth, (user) => {
-                    this.user = user
-                })
-            },
-            async signOut() {
-                const auth = getAuth()
-                await auth.signOut()
-                this.user = null
-            },
+    () => {
+        const user = ref(null)
+        const error = ref(null)
+        const isAuthenticated = computed(() => user.value !== null)
+        const getUser = computed(() => user.value)
+
+        const signIn = async (email, password) => {
+            const auth = getAuth()
+            const userCredential = await signInWithEmailAndPassword(auth, email, password)
+            user.value = userCredential.user
+            return user.value
+        }
+        const init = async () => {
+            const auth = getAuth()
+            await setPersistence(auth, browserSessionPersistence)
+            onAuthStateChanged(auth, (user) => {
+                user.value = user
+            })
+        }
+        const signOut = async () => {
+            const auth = getAuth()
+            await auth.signOut()
+            user.value = null
+            window.location.href = '/login'
+        }
+
+        return {
+            user,
+            error,
+            isAuthenticated,
+            getUser,
+            signIn,
+            init,
+            signOut
         }
     })

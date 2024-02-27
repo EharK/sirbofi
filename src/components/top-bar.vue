@@ -1,8 +1,7 @@
 <template>
   <div class="top-bar-container">
     <span class="current-user">
-      <span>{{ user }}</span>
-<!--      <span>{{ user.email.split('@')[0] }}</span>-->
+      <span v-if="user">{{ user.email.split('@')[0] }}</span>
     </span>
     <span class="buttons-wrapper">
       <button @click="signOut">Log out</button>
@@ -16,7 +15,9 @@ import {ref} from "vue";
 
 const authStore = useAuthenticatorStore()
 const user = ref(authStore.user)
-const signOut = authStore.signOut()
+const signOut = () => {
+  authStore.signOut()
+}
 
 </script>
 

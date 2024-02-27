@@ -7,13 +7,13 @@
           <path d="M85.4026 -0.0802917L85.4026 255.933L147.805 256.097L147.805 0.0834427L85.4026 -0.0802917Z"/>
         </svg>
         <div class="row">
-          <loading-spinner v-if="!userConfirmed"/>
+          <loading-spinner v-if="confirmingUser"/>
         </div>
-        <div class="input-fields" v-if="userConfirmed">
+        <div class="input-fields" v-if="!confirmingUser">
           <input type="text" v-model="creds.email" placeholder="Email"/>
           <input type="password" v-model="creds.password" placeholder="key"/>
         </div>
-        <div class="buttons-wrapper" v-if="userConfirmed">
+        <div class="buttons-wrapper" v-if="!confirmingUser">
           <div class="error" v-if="error_in_authentication">
             Authentication failed
           </div>
@@ -31,11 +31,13 @@
 import LoadingSpinner from "@/components/loadingSpinner.vue";
 import {ref} from "vue";
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
+import router from "@/router/index.js";
 
+const authStore = useAuthenticatorStore()
+const confirmingUser = ref(false)
 
 const auth_loading = ref(false)
 const error_in_authentication = ref(false)
-const userConfirmed = useAuthenticatorStore().FirebaseUser
 const creds = ref({
   email: '',
   password: ''
@@ -44,17 +46,18 @@ const creds = ref({
 function signIn() {
   error_in_authentication.value = false;
   auth_loading.value = true
-  const {signIn} = useAuthenticatorStore()
-  signIn(creds.value.email, creds.value.password).then(
-      () => {
-        window.location.href = '/'
+  authStore.signIn(creds.value.email, creds.value.password).then(
+      (resp) => {
+        console.log(resp)
       }
   ).catch(err => {
     console.log(err)
     error_in_authentication.value = true;
-  }).finally(() => {
-    auth_loading.value = false
-  })
+  }).finally(
+      () => {
+        auth_loading.value = false
+      }
+  )
 }
 
 window.addEventListener('keypress', (e) => {
