@@ -1,0 +1,138 @@
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+:root {
+    --light: rgba(207, 214, 230);
+    --slight: rgba(230, 230, 230, 0.25);
+    --black: #1a1a1a;
+    --light-green: rgba(92, 230, 205, 0.2);
+    --glow-green: #80ff80;
+    --light-red: rgba(230, 92, 92, 0.2);
+    --glow-red: #ff8080;
+}
+
+html {
+    height: 100%;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.text {
+    font-size: 14px;
+}
+
+.text.underline {
+    text-decoration: underline;
+    text-decoration-color: var(--glow-green);
+}
+
+button {
+    cursor: pointer;
+    outline: none;
+    border: 1px solid var(--light);
+    background-color: transparent;
+    color: var(--light);
+    border-radius: 8px;
+    padding: 8px 24px;
+    transition: background 0.1s ease-in-out, width 1s ease-in-out;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    gap: 8px;
+}
+
+button.bones {
+    padding: 0;
+    border: none;
+    margin: 5px 0;
+}
+
+button.bones:hover {
+    background-color: transparent;
+    color: var(--glow-green);
+}
+
+button.round {
+    border-radius: 50%;
+    padding: 8px;
+    aspect-ratio: 1/1;
+    justify-content: center;
+}
+
+button:active {
+    opacity: 0.8;
+    cursor: unset;
+}
+
+button:hover {
+    background-color: var(--light-green);
+}
+
+button.toggle-button {
+    border-color: var(--slight);
+    transition: border-color 0.5s ease-in-out;
+}
+
+button.toggle-button.selected {
+    background-color: var(--light-green);
+    border-color: var(--glow-green);
+    color: var(--glow-green);
+}
+
+input {
+    text-align: left !important;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid var(--light);
+    background-color: #333333;
+    color: var(--light);
+    padding: 4px 8px;
+    margin-bottom: 10px;
+}
+
+.pad {
+    width: max-content;
+    height: max-content;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    outline: 1px solid rgba(230, 230, 230, 0.25);
+    background-color: #333333;
+    border-radius: 8px;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+}
+
+.text-green {
+    color: var(--glow-green);
+}
+
+.text-red {
+    color: var(--glow-red);
+}
+
+.wrap-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
