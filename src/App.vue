@@ -5,11 +5,15 @@
 </template>
 
 <script setup>
-import { useAuthenticatorStore } from "@/stores/Authenticator.js";
+import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 import {RouterView} from 'vue-router'
-import { initializeApp } from "firebase/app";
-import { onBeforeMount } from "vue";
+import {initializeApp} from "firebase/app";
+import {onBeforeMount} from "vue";
 import router from "@/router/index.js";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
+
+let auth;
+const authStore = useAuthenticatorStore()
 
 onBeforeMount(() => {
   const firebaseConfig = {
@@ -22,12 +26,22 @@ onBeforeMount(() => {
     measurementId: "G-W5TJ6PV4GV"
   };
   initializeApp(firebaseConfig);
-  const authStore = useAuthenticatorStore()
 
-  if (!authStore.user) {
-    router.push('/login')
-  }
+  const auth = getAuth()
+  onAuthStateChanged(auth, (user) => {
+    console.log(user)
+    if (user) {
+      authStore.setUserData(user)
+      authStore.setLoggedIn(true)
+      router.push('/')
+    } else {
+      authStore.setUserData(null)
+      authStore.setLoggedIn(false)
+      router.push('/login')
+    }
+  })
 })
+
 </script>
 
 <style scoped>

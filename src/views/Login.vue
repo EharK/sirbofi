@@ -11,7 +11,7 @@
         </div>
         <div class="input-fields" v-if="!confirmingUser">
           <input type="text" v-model="creds.email" placeholder="Email"/>
-          <input type="password" v-model="creds.password" placeholder="key"/>
+          <input type="password" v-model="creds.password" placeholder="Key"/>
         </div>
         <div class="buttons-wrapper" v-if="!confirmingUser">
           <div class="error" v-if="error_in_authentication">
@@ -31,7 +31,8 @@
 import LoadingSpinner from "@/components/loadingSpinner.vue";
 import {ref} from "vue";
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import router from "@/router/index.js";
+import {useRouter} from "vue-router";
+const router = useRouter()
 
 const authStore = useAuthenticatorStore()
 const confirmingUser = ref(false)
@@ -47,8 +48,13 @@ function signIn() {
   error_in_authentication.value = false;
   auth_loading.value = true
   authStore.signIn(creds.value.email, creds.value.password).then(
-      (resp) => {
-        console.log(resp)
+      (user) => {
+        if (user && user.data?.uid) {
+          router.push('/')
+        } else {
+          console.log('no user')
+          error_in_authentication.value = true;
+        }
       }
   ).catch(err => {
     console.log(err)
@@ -106,6 +112,7 @@ window.addEventListener('keypress', (e) => {
 .input-fields {
   display: flex;
   flex-direction: column;
+  gap: 8px;
   margin: 40px 0;
 }
 

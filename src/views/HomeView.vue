@@ -208,14 +208,14 @@
 import TopBar from "@/components/top-bar.vue";
 import LoadingSpinner from "@/components/loadingSpinner.vue";
 import {computed, onMounted, ref} from "vue";
+import axios from "axios";
 
 const nFormat = new Intl.NumberFormat();
-const api_base_address = 'http://localhost:3987'
-const api_unreachable_error = "Couldn't access API. Node.js asks permission to run API at Sir Bofi runtime. " +
-    "If the error persists even after giving permission, then try restarting Sir Bofi or running as an Administrator."
+const api_base_address = 'https://data.sirbofi.com'
+const api_unreachable_error = "Couldn't access API."
 
 function openInNewTab(url) {
-  return navigateTo(url, {open: {target: '_blank'}})
+  window.open(url, '_blank')
 }
 
 onMounted(() => {
@@ -359,14 +359,14 @@ async function searchOpportunities() {
   request_error.value = null
   scraping.value = true
   amount_of_opportunities_found.value = 0
-  await $fetch(`${api_base_address}/api/listings?start=${(Number(starting_point.value) || 1).toString()}&limit=${(Number(crypto_list_len.value) || 20).toString()}`)
+  await axios.get(`${api_base_address}/api/listings?start=${(Number(starting_point.value) || 1).toString()}&limit=${(Number(crypto_list_len.value) || 20).toString()}`)
       .then(res => {
         if (res.status === 429) {
           request_error.value = "too many requests"
           scraping.value = false
           return false
         }
-        crypto_listings.value = res.data.cryptoCurrencyList
+        crypto_listings.value = res.data.data.cryptoCurrencyList
         getAllOpportunities()
       }).catch(err => {
         console.log(err)
@@ -379,21 +379,21 @@ async function marketPairsFromSlug(slug) {
   if (selected_quote_symbols.value.length > 0) {
     let tmp = []
     for (const quote_symbol of selected_quote_symbols.value) {
-      await $fetch(`${api_base_address}/api/market-pairs?slug=${slug}&start=
+      await axios.get(`${api_base_address}/api/market-pairs?slug=${slug}&start=
       ${market_pairs_offset.value}&limit=${Number(markets_pairs_limit.value)}`
           + `&quoteCurrencyId=${quote_symbol_ids[quote_symbol].toString()}`
           + (selected_trading_category.value ? `&category=${selected_trading_category.value.toString()}` : '')).then(res => {
-        if (res.status === 429) {
+        if (res.data.status === 429) {
           request_error.value = "too many requests"
           scraping.value = false
           return false
-        } else if (res.status.error_code === "500") {
+        } else if (res.data.status.error_code === "500") {
           request_error.value = "server gave err 500. could be overloaded"
           scraping.value = false
           return false
         }
-        if ((res.data?.marketPairs?.length > 0)) {
-          tmp.push(...res.data.marketPairs);
+        if ((res.data?.data?.marketPairs?.length > 0)) {
+          tmp.push(...res.data.data.marketPairs);
         }
       }).catch(err => {
         console.log(err)
@@ -403,18 +403,18 @@ async function marketPairsFromSlug(slug) {
     }
     return [...new Set(tmp)]
   } else {
-    return await $fetch(`${api_base_address}/api/market-pairs?slug=${slug}&start=${market_pairs_offset.value.toString()}&limit=${Number(markets_pairs_limit.value).toString()}`
+    return await axios.get(`${api_base_address}/api/market-pairs?slug=${slug}&start=${market_pairs_offset.value.toString()}&limit=${Number(markets_pairs_limit.value).toString()}`
         + (selected_trading_category.value ? `&category=${selected_trading_category.value.toString()}` : '')).then(res => {
-      if (res.status === 429) {
+      if (res.data.status === 429) {
         request_error.value = "too many requests"
         scraping.value = false
         return false
-      } else if (res.status.error_code === "500") {
+      } else if (res.data.status.error_code === "500") {
         request_error.value = "server gave err 500. could be overloaded"
         scraping.value = false
         return false
       }
-      return [...new Set(res.data.marketPairs)];
+      return [...new Set(res.data.data.marketPairs)];
     }).catch(err => {
       console.log(err)
       request_error.value = api_unreachable_error
@@ -433,16 +433,10 @@ const opportunities = ref({})
 async function getAllOpportunities() {
   let ops = {}
   for (const crypto of crypto_listings.value) {
-    if (scraping.value === false) {
-      break
-    }
+    if (scraping.value === false) {break}
     await marketPairsFromSlug(crypto.slug).then(pairs => {
-      if (!pairs) {
-        return
-      }
-
+      if (!pairs) {return}
       let filtered_pairs = []
-
       // filter out pairs that don't meet the criteria
       for (const pair of pairs) {
         if (pair.volumeUsd > minimum_trading_volume.value

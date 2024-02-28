@@ -1,22 +1,23 @@
 <template>
   <div class="top-bar-container">
     <span class="current-user">
-      <span v-if="user">{{ user.email.split('@')[0] }}</span>
+<!--      <span v-if="user">{{ user.email.split('@')[0] }}</span>-->
     </span>
     <span class="buttons-wrapper">
-      <button @click="signOut">Log out</button>
+      <button @click="signOutHandler">Log out</button>
     </span>
   </div>
 </template>
 
 <script setup>
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import {ref} from "vue";
+import {getAuth, signOut} from "firebase/auth";
 
 const authStore = useAuthenticatorStore()
-const user = ref(authStore.user)
-const signOut = () => {
-  authStore.signOut()
+
+const signOutHandler = () => {
+  const auth = getAuth()
+  signOut(auth)
 }
 
 </script>

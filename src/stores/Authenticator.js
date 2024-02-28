@@ -14,38 +14,45 @@ export const useAuthenticatorStore
     = defineStore(
     'AuthenticatorStore',
     () => {
-        const user = ref(null)
+        const user = {
+            is_logged_in: false,
+            data: {}
+        }
+        const setUserData = (data) => {
+            user.data = data
+        }
+        const setLoggedIn = (logged_in) => {
+            user.logged_in = logged_in
+        }
         const error = ref(null)
-        const isAuthenticated = computed(() => user.value !== null)
-        const getUser = computed(() => user.value)
+        const getUser = computed(() => user)
 
         const signIn = async (email, password) => {
             const auth = getAuth()
-            const userCredential = await signInWithEmailAndPassword(auth, email, password)
-            user.value = userCredential.user
-            return user.value
+            await signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    setUserData(userCredential.user)
+                }).catch((error) => {
+                    console.log(error.message)
+                    error.value = error.message
+                })
+            return user
         }
-        const init = async () => {
-            const auth = getAuth()
-            await setPersistence(auth, browserSessionPersistence)
-            onAuthStateChanged(auth, (user) => {
-                user.value = user
+        const signOut = async (auth) => {
+            await auth.signOut().then(() => {
+                setLoggedIn(false)
+            }).catch((error) => {
+                console.log(error.message)
+                error.value = error.message
             })
         }
-        const signOut = async () => {
-            const auth = getAuth()
-            await auth.signOut()
-            user.value = null
-            window.location.href = '/login'
-        }
-
         return {
             user,
             error,
-            isAuthenticated,
+            setUserData,
+            setLoggedIn,
             getUser,
             signIn,
-            init,
             signOut
         }
     })
