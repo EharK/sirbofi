@@ -335,9 +335,39 @@ const scraping = ref(false)
 const nr_of_market_pairs_checked = ref(0)
 const nr_of_price_comparisons = ref(0)
 const nr_of_cryptos_checked = ref(0)
+const opportunities_count_limit = ref(200)
 
 
 // MISC
+
+const UrlCompiler = {
+  listingsEndpoint: () => {
+    const base = api_base_address + "/api/listings"
+    const params = {
+      start: starting_point.value || 1,
+      limit: crypto_list_len.value || 20,
+    }
+    return base + '?' + new URLSearchParams(params).toString()
+  },
+  marketPairsEndpoint: (slug, quote_symbol = null) => {
+    const base = api_base_address + "/api/market-pairs"
+    const params = {
+      slug: slug,
+      start: market_pairs_offset.value || 1,
+      limit: markets_pairs_limit.value || 20
+    }
+    if (selected_trading_category.value) {
+      params.category = selected_trading_category.value
+    }
+    if (quote_symbol) {
+      params.quoteCurrencyId = quote_symbol_ids[quote_symbol]
+    }
+    const result = base + '?' + new URLSearchParams(params).toString()
+    console.log(result)
+    return result
+  },
+}
+
 function frmtNr(nr) {
   return Intl.NumberFormat().format(nr)
 }
@@ -359,7 +389,8 @@ async function searchOpportunities() {
   request_error.value = null
   scraping.value = true
   amount_of_opportunities_found.value = 0
-  await axios.get(`${api_base_address}/api/listings?start=${(Number(starting_point.value) || 1).toString()}&limit=${(Number(crypto_list_len.value) || 20).toString()}`)
+  const listings_api_url = UrlCompiler.listingsEndpoint()
+  await axios.get(listings_api_url)
       .then(res => {
         if (res.status === 429) {
           request_error.value = "too many requests"
@@ -376,35 +407,12 @@ async function searchOpportunities() {
 }
 
 async function marketPairsFromSlug(slug) {
-  if (selected_quote_symbols.value.length > 0) {
-    let tmp = []
-    for (const quote_symbol of selected_quote_symbols.value) {
-      await axios.get(`${api_base_address}/api/market-pairs?slug=${slug}&start=
-      ${market_pairs_offset.value}&limit=${Number(markets_pairs_limit.value)}`
-          + `&quoteCurrencyId=${quote_symbol_ids[quote_symbol].toString()}`
-          + (selected_trading_category.value ? `&category=${selected_trading_category.value.toString()}` : '')).then(res => {
-        if (res.data.status === 429) {
-          request_error.value = "too many requests"
-          scraping.value = false
-          return false
-        } else if (res.data.status.error_code === "500") {
-          request_error.value = "server gave err 500. could be overloaded"
-          scraping.value = false
-          return false
-        }
-        if ((res.data?.data?.marketPairs?.length > 0)) {
-          tmp.push(...res.data.data.marketPairs);
-        }
-      }).catch(err => {
-        console.log(err)
-        request_error.value = api_unreachable_error
-        scraping.value = false
-      })
-    }
-    return [...new Set(tmp)]
-  } else {
-    return await axios.get(`${api_base_address}/api/market-pairs?slug=${slug}&start=${market_pairs_offset.value.toString()}&limit=${Number(markets_pairs_limit.value).toString()}`
-        + (selected_trading_category.value ? `&category=${selected_trading_category.value.toString()}` : '')).then(res => {
+  // normal search IF no quote symbol is selected ELSE iterate over selected quote symbols ->
+  const custom_quote_symbol_list = selected_quote_symbols.value.length > 0 ? selected_quote_symbols.value : [null]
+  let tmp = []
+  for (const quote_symbol of custom_quote_symbol_list) {
+    const endpoint = UrlCompiler.marketPairsEndpoint(slug, quote_symbol)
+    await axios.get(endpoint).then(res => {
       if (res.data.status === 429) {
         request_error.value = "too many requests"
         scraping.value = false
@@ -414,13 +422,16 @@ async function marketPairsFromSlug(slug) {
         scraping.value = false
         return false
       }
-      return [...new Set(res.data.data.marketPairs)];
+      if ((res.data?.data?.marketPairs?.length > 0)) {
+        tmp.push(...res.data.data.marketPairs);
+      }
     }).catch(err => {
       console.log(err)
       request_error.value = api_unreachable_error
       scraping.value = false
     })
   }
+  return [...new Set(tmp)]
 }
 
 function getComparisonProfitOfPairs(buyFromPair, sellToPair) {
@@ -433,9 +444,13 @@ const opportunities = ref({})
 async function getAllOpportunities() {
   let ops = {}
   for (const crypto of crypto_listings.value) {
-    if (scraping.value === false) {break}
+    if (scraping.value === false) {
+      break
+    }
     await marketPairsFromSlug(crypto.slug).then(pairs => {
-      if (!pairs) {return}
+      if (!pairs) {
+        return
+      }
       let filtered_pairs = []
       // filter out pairs that don't meet the criteria
       for (const pair of pairs) {
@@ -475,7 +490,7 @@ async function getAllOpportunities() {
                 }
             )
             amount_of_opportunities_found.value++
-            if (amount_of_opportunities_found.value >= 1000) {
+            if (amount_of_opportunities_found.value >= opportunities_count_limit.value) {
               scraping.value = false;
               request_error.value = "Illogical amount of results! Stopped search to protect performance. You need more strict filters.";
             }

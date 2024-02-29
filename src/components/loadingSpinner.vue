@@ -27,7 +27,7 @@
 
 @keyframes spin {
   to {
-    transform: rotate(360deg);
+    transform: rotate(calc(360deg * 1));
   }
 }
 </style>

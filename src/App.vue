@@ -5,16 +5,7 @@
 </template>
 
 <script setup>
-import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 import {RouterView} from 'vue-router'
-import {onBeforeMount} from "vue";
-
-let auth;
-const authStore = useAuthenticatorStore()
-
-onBeforeMount(() => {
-  authStore.initAuth()
-})
 
 </script>
 

@@ -29,15 +29,13 @@
 
 <script setup>
 import LoadingSpinner from "@/components/loadingSpinner.vue";
-import {onBeforeMount, ref} from "vue";
+import {computed, ref} from "vue";
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 import {useRouter} from "vue-router";
-import {getAuth} from "firebase/auth";
 const router = useRouter()
 
 const authStore = useAuthenticatorStore()
-const confirmingUser = ref(false)
-
+const confirmingUser = computed(() => authStore.confirming_user)
 const auth_loading = ref(false)
 const error_in_authentication = ref(false)
 const creds = ref({
@@ -48,19 +46,22 @@ const creds = ref({
 function signIn() {
   error_in_authentication.value = false;
   auth_loading.value = true
-  authStore.signIn(creds.value.email, creds.value.password).then(
-      (user) => {
-        if (user && user.data?.uid) {
-          router.push('/')
-        } else {
-          console.log('no user')
-          error_in_authentication.value = true;
-        }
-      }
-  ).catch(err => {
-    console.log(err)
-    error_in_authentication.value = true;
-  }).finally(
+  authStore.signIn(creds.value.email, creds.value.password)
+      .then(
+          (user) => {
+            if (user && user.data?.uid) {
+              authStore.setUserData(user.data)
+              authStore.setUserLoggedIn(true)
+              router.push('/')
+            } else {
+              error_in_authentication.value = true;
+            }
+          }
+      ).catch(
+      (err) => {
+        console.log(err)
+        error_in_authentication.value = true;
+      }).finally(
       () => {
         auth_loading.value = false
       }

@@ -16,25 +16,25 @@ export const useAuthenticatorStore
     () => {
         const user = {
             is_logged_in: false,
-            data: {}
+            data: null
         }
         let authInitialized = false
         let auth = null
-        const setUserData = (data) => {
+
+        function setUserData(data) {
             user.data = data
         }
-        const setLoggedIn = (logged_in) => {
+
+        function setUserLoggedIn(logged_in) {
             user.is_logged_in = logged_in
         }
+
         const error = ref(null)
         const getUser = computed(
             () =>
                 user
         )
-        const getUserLoginStatus = computed(
-            () =>
-                user.is_logged_in
-        )
+        const confirming_user = ref(true)
 
         const initAuth = async () => {
             const firebaseConfig = {
@@ -48,25 +48,18 @@ export const useAuthenticatorStore
             };
             initializeApp(firebaseConfig);
             auth = getAuth()
-            await setPersistence(auth, browserSessionPersistence)
-                .then(() => {
-                    console.log("persistence SET")
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            setUserData(user)
-                            setLoggedIn(true)
-                            router.push({name: 'home'})
-                        } else {
-                            setLoggedIn(false)
-                            router.push({name: 'login'})
-                        }
-                    })
-                    authInitialized = true
-                }).catch((error) => {
-                    console.log(error.message)
-                    error.value = error.message
-                })
-
+            onAuthStateChanged(auth, (user) => {
+                confirming_user.value = false
+                if (user) {
+                    setUserData(user)
+                    setUserLoggedIn(true)
+                    router.push('/')
+                } else {
+                    setUserLoggedIn(false)
+                    router.push('/login')
+                }
+            })
+            authInitialized = true
         }
         const getAuthInitStatus = computed(
             () =>
@@ -80,6 +73,7 @@ export const useAuthenticatorStore
             await signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     setUserData(userCredential.user)
+                    setUserLoggedIn(true)
                 }).catch((error) => {
                     console.log(error.message)
                     error.value = error.message
@@ -88,7 +82,7 @@ export const useAuthenticatorStore
         }
         const signOut = async (auth) => {
             await auth.signOut().then(() => {
-                setLoggedIn(false)
+                setUserLoggedIn(false)
             }).catch((error) => {
                 console.log(error.message)
                 error.value = error.message
@@ -98,11 +92,11 @@ export const useAuthenticatorStore
             user,
             initAuth,
             error,
-            getUserLoginStatus,
             getAuthInitStatus,
             getAuthFromStore,
             setUserData,
-            setLoggedIn,
+            confirming_user,
+            setUserLoggedIn,
             getUser,
             signIn,
             signOut
