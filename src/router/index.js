@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Login from "@/views/Login.vue";
-import {getAuth} from "firebase/auth";
+import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 
 
 const router = createRouter({
@@ -25,16 +25,14 @@ const router = createRouter({
 
 
 // router.beforeEach(async (to, from, next) => {
-//     const auth = getAuth()
-//     if (to.matched.some(record => record.meta.requiresAuth)) {
-//         console.log(auth.currentUser)
-//         if (!auth.currentUser) {
-//             next(
-//                 {
-//                     name: 'login',
-//                 }
-//             )
-//         }
+//     const auth = useAuthenticatorStore().getAuthFromStore
+//     console.log("current user:", auth.currentUser, useAuthenticatorStore().getUser)
+//     console.log("to:", to.name)
+//     if (to.matched.some(record => record.meta.requiresAuth)
+//         && !auth.currentUser) {
+//             next({name: 'login'})
+//     } else if (to.name === 'login' && auth.currentUser) {
+//         next({name: 'home'})
 //     } else {
 //         next()
 //     }

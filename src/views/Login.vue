@@ -29,9 +29,10 @@
 
 <script setup>
 import LoadingSpinner from "@/components/loadingSpinner.vue";
-import {ref} from "vue";
+import {onBeforeMount, ref} from "vue";
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 import {useRouter} from "vue-router";
+import {getAuth} from "firebase/auth";
 const router = useRouter()
 
 const authStore = useAuthenticatorStore()
