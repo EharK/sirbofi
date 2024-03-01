@@ -11,7 +11,7 @@ const app = createApp(App)
 app.use(pinia)
 import { useAuthenticatorStore } from './stores/Authenticator.js'
 const authStore = useAuthenticatorStore()
-await authStore.initAuth()
+authStore.initAuth()
 
 import router from './router'
 app.use(router)
