@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins');
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -8,6 +10,11 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+a {
+    text-decoration: none;
+    color: unset;
 }
 
 :root {
@@ -32,6 +39,62 @@ html {
     -webkit-tap-highlight-color: transparent;
 }
 
+.flex {
+    display: flex;
+}
+
+.gap-4 {
+    gap: 0.4rem;
+}
+
+.gap-8 {
+    gap: 0.8rem;
+}
+
+.row {
+    flex-direction: row;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
+.align-center {
+    align-items: center;
+}
+
+h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--light);
+}
+
+h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--light);
+}
+
+.blur {
+    filter: blur(5px);
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
 .text {
     font-size: 14px;
 }
@@ -47,8 +110,8 @@ button {
     border: 1px solid var(--light);
     background-color: transparent;
     color: var(--light);
-    border-radius: 8px;
-    padding: 8px 24px;
+    border-radius: 4px;
+    padding: 8px 16px;
     transition: background 0.1s ease-in-out, width 1s ease-in-out;
     user-select: none;
     display: flex;
@@ -56,6 +119,28 @@ button {
     justify-content: center;
     width: max-content;
     gap: 8px;
+}
+
+button:active {
+    opacity: 0.8;
+    cursor: unset;
+}
+
+button:hover {
+    background-color: var(--light-green);
+    color: var(--glow-green);
+    border-color: var(--glow-green);
+}
+
+button.cta {
+    background-color: var(--glow-green);
+    color: var(--black);
+    border-color: var(--glow-green);
+    transition: transform 0.15s;
+}
+
+button.cta:hover {
+    transform: translateY(-2px);
 }
 
 button.bones {
@@ -74,15 +159,6 @@ button.round {
     padding: 8px;
     aspect-ratio: 1/1;
     justify-content: center;
-}
-
-button:active {
-    opacity: 0.8;
-    cursor: unset;
-}
-
-button:hover {
-    background-color: var(--light-green);
 }
 
 button.toggle-button {
