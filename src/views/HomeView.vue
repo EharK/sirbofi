@@ -1,13 +1,33 @@
 <template>
   <main>
-    <top-bar/>
     <div class="service-container">
       <div class="filters-container">
-        <button class="hide-filters-button"
-                @click="filter_pad_hidden=!filter_pad_hidden">
-          <span class="icon open-close">{{ filter_pad_hidden ? '>' : '<️' }}</span>
-        </button>
         <div :class="{'pad filtering-pad': true, 'hidden': filter_pad_hidden}">
+          <div class="filters-container-top-bar">
+            <div class="flex column w-full">
+              <button class="toggle-button w-full" :class="{'selected': !filter_pad_hidden}"
+                      @click="filter_pad_hidden=!filter_pad_hidden">
+                <h2 class="text">{{ filter_pad_hidden ? " << Undocked" : " >> Docked" }}</h2>
+              </button>
+              <div class="flex row space-between">
+                <button class="filter-pad-top-nav-button bones"
+                        v-if="current_filter_pad_view === filter_pad_view_types.advanced"
+                        @click="changeFilterPadView(filter_pad_view_types.basic)">
+                  <span class="text underline">{{ '< basic settings' }}</span>
+                </button>
+                <button class="filter-pad-top-nav-button bones"
+                        v-else
+                        @click="changeFilterPadView(filter_pad_view_types.advanced)">
+                  <span class="text underline">Advanced settings ></span>
+                </button>
+                <button class="filter-pad-top-nav-button bones"
+                        :class="{'disabled': !Object.keys(opportunities).length}"
+                        @click="clearResults">
+                  <span>Clear results</span>
+                </button>
+              </div>
+            </div>
+          </div>
           <div class="filtering-pad-content-wrapper basic"
                v-if="current_filter_pad_view === filter_pad_view_types.basic">
             <div :class="{'inputs-wrapper': true, 'disabled': scraping}">
@@ -38,12 +58,7 @@
             </div>
             <span class="bottom-buttons">
             <button class="bones"
-                    v-if="!scraping"
-                    @click="changeFilterPadView(filter_pad_view_types.advanced)">
-              <span class="text underline">Advanced settings</span>
-            </button>
-            <button class="bones"
-                    v-if="scraping"
+                    :class="{'disabled': !scraping}"
                     @click="stopScraping()">
               <span class="text underline">stop</span>
             </button>
@@ -73,9 +88,6 @@
           </div>
           <div class="filtering-pad-content-wrapper advanced"
                v-if="current_filter_pad_view === filter_pad_view_types.advanced">
-            <button class="back bones" @click="changeFilterPadView(filter_pad_view_types.basic)">
-              <span class="text underline">{{ '< basic settings' }}</span>
-            </button>
             <div class="inputs-wrapper">
               <div class="advanced-filter-container">
             <span class="text">
@@ -140,63 +152,71 @@
                 </div>
               </div>
             </div>
-            <button class="back bones" @click="changeFilterPadView(filter_pad_view_types.basic)">
-              <span class="text underline">{{ '< basic settings' }}</span>
-            </button>
           </div>
         </div>
       </div>
-      <div class="all-ops">
-        <button class="clear-results" @click="clearResults" v-if="Object.keys(opportunities).length">
-          <span>Clear results</span>
-        </button>
-        <div class="ops-per-crypto" v-for="crypto in Object.keys(opportunities)">
-          <h2 class="crypto-section-title">{{ crypto }}</h2>
-          <div class="op-table-headers">
-            <div class="text exchange-link-header">
-              Buy from
+      <div class="flex column main-board">
+        <top-bar/>
+        <div class="all-ops">
+          <div class="ops-per-crypto" v-for="crypto in Object.keys(opportunities)">
+            <h2 class="crypto-section-title">{{ crypto }}</h2>
+            <div class="op-table-headers">
+              <div class="text exchange-link-header">
+                Buy from
+              </div>
+              <div class="text price-header">
+                price
+              </div>
+              <div class="text volume-header">
+                24h volume
+              </div>
+              <div class="text profit-percentage-header">
+                gap
+              </div>
+              <div class="text volume-header">
+                24h volume
+              </div>
+              <div class="text price-header">
+                price
+              </div>
+              <div class="text exchange-link-header">
+                Sell to
+              </div>
             </div>
-            <div class="text price-header">
-              price
-            </div>
-            <div class="text volume-header">
-              24h volume
-            </div>
-            <div class="text profit-percentage-header">
-              gap
-            </div>
-            <div class="text volume-header">
-              24h volume
-            </div>
-            <div class="text price-header">
-              price
-            </div>
-            <div class="text exchange-link-header">
-              Sell to
+            <div class="op" v-for="op in opportunities[crypto]">
+              <button class="text exchange-link" @click="openInNewTab(op.buy_link)">
+                {{ op.buy_from_exchange }}
+              </button>
+              <div class="text indicator price">
+                {{ frmtNr(op.buy_from_price) }} $
+              </div>
+              <div class="text indicator volume">
+                {{ op.buy_from_volume }} $
+              </div>
+              <div class="text text-green indicator profit-percentage">
+                +{{ op.potential_profit }} %
+              </div>
+              <div class="text indicator volume">
+                {{ op.sell_to_volume }} $
+              </div>
+              <div class="text indicator price">
+                {{ frmtNr(op.sell_to_price) }} $
+              </div>
+              <button class="text exchange-link" @click="openInNewTab(op.sell_link)">
+                {{ op.sell_to_exchange }}
+              </button>
             </div>
           </div>
-          <div class="op" v-for="op in opportunities[crypto]">
-            <button class="text exchange-link" @click="openInNewTab(op.buy_link)">
-              {{ op.buy_from_exchange }}
-            </button>
-            <div class="text indicator price">
-              {{ frmtNr(op.buy_from_price) }} $
-            </div>
-            <div class="text indicator volume">
-              {{ op.buy_from_volume }} $
-            </div>
-            <div class="text text-green indicator profit-percentage">
-              +{{ op.potential_profit }} %
-            </div>
-            <div class="text indicator volume">
-              {{ op.sell_to_volume }} $
-            </div>
-            <div class="text indicator price">
-              {{ frmtNr(op.sell_to_price) }} $
-            </div>
-            <button class="text exchange-link" @click="openInNewTab(op.sell_link)">
-              {{ op.sell_to_exchange }}
-            </button>
+          <div class="no-results-placeholder" v-if="Object.keys(opportunities).length === 0 && !scraping">
+            <h1>No results</h1>
+            <ul>
+              <li>Apply desired filters on left</li>
+              <li>Click "Trigger" to start</li>
+              <li>Wait for results to load</li>
+            </ul>
+          </div>
+          <div v-if="scraping">
+            <loading-spinner :size="64"/>
           </div>
         </div>
       </div>
@@ -525,6 +545,12 @@ const filter_by_trading_categories = computed(() => {
 
 <style scoped>
 
+ul {
+  line-height: 2;
+  list-style: none;
+  text-align: center;
+}
+
 .service-container {
   position: relative;
   display: flex;
@@ -533,6 +559,15 @@ const filter_by_trading_categories = computed(() => {
   gap: 20px;
   height: 100%;
   overflow: hidden;
+}
+
+.no-results-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 100px;
+  align-items: center;
 }
 
 .text-tiny {
@@ -545,39 +580,34 @@ input {
 
 .filters-container {
   position: relative;
-}
-
-.hide-filters-button {
-  position: absolute;
-  right: 0;
-  width: 30px;
-  height: calc(100vh - 120px);
-  border-radius: 0 8px 8px 0;
-  z-index: 99;
-  border: 0;
-  padding: 8px;
-  aspect-ratio: 1/1;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
 }
 
-.hide-filters-button:hover {
-  background: linear-gradient(90deg, transparent, var(--light-green));
+.main-board {
+  width: 100%;
 }
 
 .filtering-pad {
   width: 400px;
-  height: calc(100vh - 120px);
+  height: 100vh;
   overflow: auto;
-  padding: 20px 40px;
-  background-color: transparent;
-  border-radius: 0 8px 8px 0;
-  position: sticky;
-  top: 1px;
-  transition: margin 0.2s ease-in-out;
+  background: linear-gradient(180deg, #262626, #151515);
+  border-radius: 0;
+  outline: 0;
+  transition: margin 0.2s, height 0.2s;
 }
 
 .filtering-pad.hidden {
   margin-left: -380px;
+  height: 80vh;
+  position: absolute;
+  border-radius: 0 4px 4px 0;
+}
+
+.filtering-pad.hidden:hover {
+  margin-left: 0;
 }
 
 .filtering-pad::-webkit-scrollbar {
@@ -594,12 +624,27 @@ input {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-top: 8rem;
+  padding: 1rem 2rem;
 }
 
 .filtering-pad-content-wrapper .inputs-wrapper {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.filters-container-top-bar {
+  position: fixed;
+  padding: 1rem 2rem;
+  border-radius: 4px;
+  width: inherit;
+  backdrop-filter: blur(4px) brightness(0.4);
+  z-index: 9;
+}
+
+button.filter-pad-top-nav-button {
+  margin-top: 20px;
 }
 
 .bottom-buttons {
@@ -625,10 +670,6 @@ input {
   height: calc(100vh - 100px);
   overflow-y: auto;
   min-width: 650px;
-}
-
-button.clear-results {
-  margin: 0 auto -50px;
 }
 
 .ops-per-crypto {
@@ -735,9 +776,6 @@ button.clear-results {
 }
 
 @media screen and (max-width: 1000px) {
-  .icon.open-close {
-    transform: rotate(90deg);
-  }
 
   .service-container {
     flex-direction: column;
@@ -748,15 +786,6 @@ button.clear-results {
     width: 100%;
     height: max-content;
     margin-bottom: 50px;
-  }
-
-  .filters-container .hide-filters-button {
-    display: none;
-    width: 100%;
-    height: 50px;
-    border-radius: 0;
-    bottom: -50px;
-    background: linear-gradient(0deg, transparent, var(--light-green));
   }
 
   .filtering-pad {
