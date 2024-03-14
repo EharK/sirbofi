@@ -545,6 +545,27 @@ const filter_by_trading_categories = computed(() => {
 
 <style scoped>
 
+/* width */
+.main-board *::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.main-board *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+.main-board *::-webkit-scrollbar-thumb {
+  background: var(--slight);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+.main-board *::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 ul {
   line-height: 2;
   list-style: none;
@@ -556,7 +577,6 @@ ul {
   display: flex;
   flex-direction: row;
   width: 100%;
-  gap: 20px;
   height: 100%;
   overflow: hidden;
 }
@@ -663,7 +683,7 @@ button.filter-pad-top-nav-button {
 .all-ops {
   display: flex;
   flex-direction: column;
-  padding: 0 40px;
+  padding: 20px 40px;
   width: 100%;
   gap: 60px;
   min-height: 0;
