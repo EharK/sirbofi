@@ -30,12 +30,8 @@ const signOutHandler = () => {
   justify-content: space-between;
   align-items: center;
   padding: 10px 40px;
-  border: 1px solid var(--slight);
   background-color: #1a1a1a;
-  border-radius: 8px;
   position: sticky;
-  top: 20px;
-  margin: 0 20px 40px;
   opacity: 0.4;
   transition: opacity 0.1s ease-in-out;
   z-index: 100;

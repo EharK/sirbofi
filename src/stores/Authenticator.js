@@ -38,7 +38,7 @@ export const useAuthenticatorStore
 
         const initAuth = async () => {
             const firebaseConfig = {
-                apiKey: "AIzaSyD81g-c9f8yiDbC_atW-Pvp_MP7t_aTjKQ",
+                apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
                 authDomain: "aoft-de2ab.firebaseapp.com",
                 projectId: "aoft-de2ab",
                 storageBucket: "aoft-de2ab.appspot.com",
