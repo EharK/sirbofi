@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@kolirt/vue-web3-auth": "^2.3.2",
     "axios": "^1.6.7",
     "firebase": "^10.8.0",
     "pinia": "^2.1.7",

@@ -1,7 +1,10 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Login from "@/views/Login.vue";
+
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
+import Subscription from "@/views/Subscription.vue";
+import Payment from "@/views/Payment.vue";
 
 
 const router = createRouter({
@@ -23,12 +26,12 @@ const router = createRouter({
         {
             path: '/subscription',
             name: 'subscription',
-            component: () => import('../views/Subscription.vue'),
+            component: Subscription,
         },
         {
             path: '/payment',
             name: 'payment',
-            component: () => import('../views/Payment.vue'),
+            component: Payment,
         }
     ]
 })

@@ -1,3 +1,55 @@
+<script setup>
+import {
+  $off,
+  $on,
+  Events,
+  account,
+  connect as masterConnect,
+  disconnect as masterDisconnect,
+} from '@kolirt/vue-web3-auth';
+import { computed, reactive } from 'vue';
+import {useRouter} from "vue-router";
+import {useAuthenticatorStore} from "@/stores/Authenticator.js";
+
+const router = useRouter()
+const authStore = useAuthenticatorStore()
+
+const loading = reactive({
+  connecting: false
+})
+
+async function connect(newChain) {
+  const handler = (state) => {
+    if (!state) {
+      loading.connecting = false
+      $off(Events.ModalStateChanged, handler)
+    }
+  }
+
+  $on(Events.ModalStateChanged, handler)
+
+  loading.connecting = true
+  
+  await masterConnect(newChain)
+
+  const connectedHandler = () => {
+    authStore.setUserData(account.address)
+    authStore.setUserLoggedIn(true)
+    router.push('/')
+    $off(Events.Connected, connectedHandler)
+  }
+  $on(Events.Connected, connectedHandler)
+}
+
+async function reconnect(newChain) {
+  if (chain.value.id !== newChain.id) {
+    await masterDisconnect()
+    await masterConnect(newChain)
+  }
+}
+
+</script>
+
 <template>
   <div class="main-container">
       <div class="top-buttons-wrapper">
@@ -18,7 +70,7 @@
           <div class="row">
             <loading-spinner v-if="confirmingUser"/>
           </div>
-          <div class="input-fields" v-if="!confirmingUser">
+          <!-- <div class="input-fields" v-if="!confirmingUser">
             <input type="text" v-model="creds.email" placeholder="Email"/>
             <input type="password" v-model="creds.password" placeholder="Key"/>
           </div>
@@ -30,6 +82,14 @@
               <loading-spinner v-if="auth_loading"/>
               Authenticate
             </button>
+          </div> -->
+
+          <div class="buttons-wrapper">
+            <button @click="connect()">
+              {{ loading.connecting ? 'Connecting...' : 'Connect wallet' }}
+            </button>
+          </div>
+          <div class="buttons-wrapper">
           </div>
         </div>
       </div>
@@ -37,7 +97,7 @@
   </div>
 </template>
 
-<script setup>
+<!-- <script setup>
 import LoadingSpinner from "@/components/loadingSpinner.vue";
 import {computed, ref} from "vue";
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
@@ -84,7 +144,7 @@ window.addEventListener('keypress', (e) => {
     signIn()
   }
 })
-</script>
+</script> -->
 
 <style scoped>
 
@@ -157,7 +217,7 @@ window.addEventListener('keypress', (e) => {
 .buttons-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
 }
 
