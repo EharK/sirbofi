@@ -4,13 +4,14 @@
       <button>{{ account.shortAddress }}</button>
     </span>
     <span class="buttons-wrapper">
-      <button @click="signOutHandler(account.address)">{{ loading.logouting ? 'Logouting...' : 'Log out' }}</button>
+      <button @click="disconnect">{{ loading.logouting ? 'Logouting...' : 'Log out' }}</button>
     </span>
   </div>
 </template>
 
 <script setup>
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
+import {getAuth, signOut} from "firebase/auth";
 import { account } from '@kolirt/vue-web3-auth';
 import {
   $off,
@@ -18,29 +19,38 @@ import {
   Events,
   disconnect as masterDisconnect
 } from '@kolirt/vue-web3-auth';
+import {useRouter} from "vue-router";
 import { reactive } from 'vue';
 
-const authStore = useAuthenticatorStore();
+const router = useRouter()
+const authStore = useAuthenticatorStore()
 
 const loading = reactive({
   logouting: false
-});
+})
 
-async function signOutHandler(walletAddress) {
+// const signOutHandler = () => {
+//   const auth = getAuth()
+//   signOut(auth)
+// }
+
+async function disconnect() {
   loading.logouting = true
   const handler = () => {
-    loading.logouting = false;
-    authStore.signOut(walletAddress);
-    $off(Events.Disconnected, handler);
+    loading.logouting = false
+    authStore.setUserData(null)
+    router.push('/login')
+    $off(Events.Disconnected, handler)
   }
 
-  $on(Events.Disconnected, handler);
+  $on(Events.Disconnected, handler)
 
   await masterDisconnect().catch(() => {
-    loading.logouting = false;
-    $off(Events.Disconnected, handler);
+    loading.logouting = false
+    $off(Events.Disconnected, handler)
   })
 }
+
 </script>
 
 <style scoped>

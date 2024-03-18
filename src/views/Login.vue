@@ -4,16 +4,19 @@ import {
   $on,
   Events,
   account,
-  connect as masterConnect
+  connect as masterConnect,
+  disconnect as masterDisconnect,
 } from '@kolirt/vue-web3-auth';
-import {reactive} from 'vue';
+import { computed, reactive } from 'vue';
+import {useRouter} from "vue-router";
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 
-const authStore = useAuthenticatorStore();
+const router = useRouter()
+const authStore = useAuthenticatorStore()
 
 const loading = reactive({
   connecting: false
-});
+})
 
 async function connect(newChain) {
   const handler = (state) => {
@@ -23,19 +26,28 @@ async function connect(newChain) {
     }
   }
 
-  $on(Events.ModalStateChanged, handler);
+  $on(Events.ModalStateChanged, handler)
 
-  loading.connecting = true;
+  loading.connecting = true
   
-  await masterConnect(newChain);
+  await masterConnect(newChain)
 
-  const connectedHandler = async () => {
-    await authStore.signIn(account.address)
+  const connectedHandler = () => {
+    authStore.setUserData(account.address)
+    authStore.setUserLoggedIn(true)
+    router.push('/')
     $off(Events.Connected, connectedHandler)
   }
-
-  $on(Events.Connected, connectedHandler);
+  $on(Events.Connected, connectedHandler)
 }
+
+async function reconnect(newChain) {
+  if (chain.value.id !== newChain.id) {
+    await masterDisconnect()
+    await masterConnect(newChain)
+  }
+}
+
 </script>
 
 <template>
@@ -55,6 +67,22 @@ async function connect(newChain) {
             <path d="M15 110.76L15 240.087L77.4026 239.923L77.4026 110.597L15 110.76Z"/>
             <path d="M85.4026 -0.0802917L85.4026 255.933L147.805 256.097L147.805 0.0834427L85.4026 -0.0802917Z"/>
           </svg>
+          <div class="row">
+            <loading-spinner v-if="confirmingUser"/>
+          </div>
+          <!-- <div class="input-fields" v-if="!confirmingUser">
+            <input type="text" v-model="creds.email" placeholder="Email"/>
+            <input type="password" v-model="creds.password" placeholder="Key"/>
+          </div>
+          <div class="buttons-wrapper" v-if="!confirmingUser">
+            <div class="error" v-if="error_in_authentication">
+              Authentication failed
+            </div>
+            <button @click="signIn" :class="{'disabled': auth_loading}">
+              <loading-spinner v-if="auth_loading"/>
+              Authenticate
+            </button>
+          </div> -->
 
           <div class="buttons-wrapper">
             <button @click="connect()">
@@ -68,6 +96,55 @@ async function connect(newChain) {
     </div>
   </div>
 </template>
+
+<!-- <script setup>
+import LoadingSpinner from "@/components/loadingSpinner.vue";
+import {computed, ref} from "vue";
+import {useAuthenticatorStore} from "@/stores/Authenticator.js";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
+
+const authStore = useAuthenticatorStore()
+const confirmingUser = computed(() => authStore.confirming_user)
+const auth_loading = ref(false)
+const error_in_authentication = ref(false)
+const creds = ref({
+  email: '',
+  password: ''
+})
+
+function signIn() {
+  error_in_authentication.value = false;
+  auth_loading.value = true
+  authStore.signIn(creds.value.email, creds.value.password)
+      .then(
+          (user) => {
+            if (user && user.data?.uid) {
+              authStore.setUserData(user.data)
+              authStore.setUserLoggedIn(true)
+              router.push('/')
+            } else {
+              error_in_authentication.value = true;
+            }
+          }
+      ).catch(
+      (err) => {
+        console.log(err)
+        error_in_authentication.value = true;
+      }).finally(
+      () => {
+        auth_loading.value = false
+      }
+  )
+}
+
+window.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    signIn()
+  }
+})
+</script> -->
 
 <style scoped>
 
