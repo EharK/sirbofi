@@ -6,7 +6,6 @@ import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 import Subscription from "@/views/Subscription.vue";
 import Payment from "@/views/Payment.vue";
 
-
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
