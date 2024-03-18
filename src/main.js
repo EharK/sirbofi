@@ -12,7 +12,7 @@ const app = createApp(App)
 app.use(pinia)
 import { useAuthenticatorStore } from './stores/Authenticator.js'
 const authStore = useAuthenticatorStore()
-authStore.initAuth()
+authStore.initFirebaseApp()
 
 import router from './router'
 app.use(router)
@@ -20,7 +20,7 @@ app.use(router)
 app.use(
     createWeb3Auth({
         projectId: '9530ebae553ee2a8259143c9f0c80b91',
-        chains: [Chains.bsc, Chains.mainnet, Chains.polygon]
+        chains: [Chains.mainnet, Chains.bsc, Chains.polygon]
     })
 )
 
