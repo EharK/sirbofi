@@ -1,15 +1,11 @@
 <script setup>
-
+import connectButtonVue from '@/components/connectButton.vue';
 </script>
 
 <template>
   <div class="main-container">
     <div class="top-buttons-wrapper">
-      <router-link to="/login">
-        <button>
-          Connect wallet
-        </button>
-      </router-link>
+      <connectButtonVue isSubscription={{true}} />
     </div>
     <div class="title-and-options">
       <h1>Choose your plan</h1>
