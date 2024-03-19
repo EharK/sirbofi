@@ -13,10 +13,10 @@ import connectButtonVue from '@/components/connectButton.vue';
         <div class="option pad space-between">
           <div class="group flex column">
             <h2>
-              Annual subscription
+              Subscription
             </h2>
             <p>
-              Pay once a year and get unlimited access!
+              Pay once a month and get unlimited access!
             </p>
           </div>
           <div class="group flex space-between align-center">
@@ -26,7 +26,7 @@ import connectButtonVue from '@/components/connectButton.vue';
               </button>
             </RouterLink>
             <p>
-              <span class="blur">299$</span> / year
+              <span>49.99$</span> per month
             </p>
           </div>
         </div>
@@ -40,7 +40,7 @@ import connectButtonVue from '@/components/connectButton.vue';
               Check my wallet
             </button>
             <p>
-              <span class="blur">4%</span> of $BOFI supply
+              <span>2M</span> $BOFI tokens
             </p>
           </div>
         </div>

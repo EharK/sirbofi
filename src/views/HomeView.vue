@@ -230,7 +230,6 @@ import LoadingSpinner from "@/components/loadingSpinner.vue";
 import {computed, onMounted, ref} from "vue";
 import axios from "axios";
 
-const nFormat = new Intl.NumberFormat();
 const api_base_address = 'https://data.sirbofi.com'
 const api_unreachable_error = "Couldn't access API."
 
