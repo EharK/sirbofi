@@ -1,33 +1,19 @@
 <script setup>
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import Moralis from 'moralis';
 import { account } from '@kolirt/vue-web3-auth';
 import connectButtonVue from '@/components/connectButton.vue';
 
 const authStore = useAuthenticatorStore();
 const getSubscription = await authStore.getSubscription();
 
-function isBofi(result) {
-  return result.symbol === "BOFI";
-}
-
 const checkWallet = async () => {
-  try {
-    const response = await Moralis.EvmApi.wallets.getWalletTokenBalancesPrice({
-      "chain": "0x1",
-      "address": account.address
-    });
-    const result = response.raw().result;
-    const bofiBalance = result.find(isBofi).balance_formatted;
-    if(bofiBalance >= getSubscription[0].bofiAmount) {
-      await authStore.setAccess(account.address, true);
-      alert("Now you can access the platform.");
-    } else {
-      await authStore.setAccess(account.address, false);
-      alert("You don't have enough BOFI tokens to access the platform.");
-    }
-  } catch (e) {
-    console.error(e);
+  const bofiBalance = await authStore.getBofiBalance();
+  if(bofiBalance >= getSubscription[0].bofiAmount) {
+    await authStore.setAccess(account.address, true);
+    alert("Now you can access the platform.");
+  } else {
+    await authStore.setAccess(account.address, false);
+    alert("You don't have enough BOFI tokens to access the platform.");
   }
 }
 </script>
@@ -35,7 +21,7 @@ const checkWallet = async () => {
 <template>
   <div class="main-container">
     <div class="top-buttons-wrapper">
-      <connectButtonVue isSubscription={{true}} />
+      <connectButtonVue :is-subscription="true" />
     </div>
     <div class="title-and-options">
       <h1>Choose your plan</h1>
@@ -66,10 +52,14 @@ const checkWallet = async () => {
             <p>Buy $BOFI once and get unlimited access while holding!</p>
           </div>
           <div class="group flex space-between align-center">
-            <button v-if="account.connected" @click="checkWallet">
-              Check my wallet
-            </button>
-            <connectButtonVue v-else isSubscription={{true}} />
+            <div v-if="account.connected">
+              <button @click="checkWallet">
+                Check my wallet
+              </button>
+            </div>
+            <div v-else>
+              <connectButtonVue :is-subscription="true" />
+            </div>
             <p>
               <span>{{getSubscription[0].bofiAmount}}</span> $BOFI tokens
             </p>

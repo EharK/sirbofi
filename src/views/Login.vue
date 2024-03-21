@@ -21,7 +21,7 @@ import connectButtonVue from '@/components/connectButton.vue';
           </svg>
 
           <div class="buttons-wrapper">
-            <connectButtonVue isSubscription={{false}} />
+            <connectButtonVue :is-subscription="false" />
           </div>
         </div>
       </div>

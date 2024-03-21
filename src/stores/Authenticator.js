@@ -10,22 +10,22 @@ export const useAuthenticatorStore
     'AuthenticatorStore',
     () => {
         const user = {
-            is_logged_in: false,
-            access_status: false,
-            bofiAmount: 0,
-            subscription_end: null,
-            subscription_start: null,
-            subscription_status: false,
-            address: null
+            is_logged_in: localStorage.getItem('is_logged_in')==='true',
+            access_status: localStorage.getItem('access_status')==='true',
+            subscription_status: localStorage.getItem('subscription_status')==='true'
         }
 
         let db = null
 
         function setUserData(user) {
+            localStorage.setItem('is_logged_in', user.is_logged_in);
+            localStorage.setItem('access_status', user.access_status);
+            localStorage.setItem('subscription_status', user.subscription_status);
             user = user
         }
 
         function setUserLoggedIn(logged_in) {
+            localStorage.setItem('is_logged_in', logged_in);
             user.is_logged_in = logged_in
         }
 
@@ -83,6 +83,7 @@ export const useAuthenticatorStore
                 subscription_start: serverTimestamp(),
                 subscription_status: true
             });
+            localStorage.setItem('subscription_status', true);
         }
 
         async function setAccess(walletAddress, status) {
@@ -94,9 +95,12 @@ export const useAuthenticatorStore
             await updateDoc(docRef, {
                 access_status: status
             });
+            localStorage.setItem('access_status', status);
+            if(status)
+                router.push('/');
         }
 
-        async function getBofiAmount() {
+        async function getBofiBalance() {
             const { formatted } = await fetchBalance({
                 address: account.address,
                 token: '0xe3374f14Be081EAe24E39E18360422b7AA769859'
@@ -115,7 +119,7 @@ export const useAuthenticatorStore
                 address: null
             }
             const userExists = await isUserExist(walletAddress);
-            const bofiAmount = await getBofiAmount();
+            const bofiAmount = await getBofiBalance();
             if(!userExists) {
                 const newUserRef = doc(collection(db, "users"));
                 data = {
@@ -144,7 +148,6 @@ export const useAuthenticatorStore
                     address: walletAddress
                 }
             }
-            
             setUserData(data)
             setUserLoggedIn(true)
             router.push('/')
@@ -160,7 +163,6 @@ export const useAuthenticatorStore
             await updateDoc(docRef, {
                 is_logged_in: false
             });
-            setUserData(null)
             setUserLoggedIn(false)
             router.push('/login')
         }
@@ -172,7 +174,7 @@ export const useAuthenticatorStore
             getSubscription,
             setSubscription,
             setAccess,
-            getBofiAmount,
+            getBofiBalance,
             getUser,
             signIn,
             signOut
