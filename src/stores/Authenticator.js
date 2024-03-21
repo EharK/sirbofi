@@ -71,8 +71,6 @@ export const useAuthenticatorStore
         }
 
         async function setSubscription(period, walletAddress) {
-            // console.log(Timestamp.fromDate(new Date()));
-            // return
             const endTimestamp = new Date();
             endTimestamp.setMonth(endTimestamp.getMonth() + period);
             const useRef = collection(db, 'users');
@@ -84,6 +82,17 @@ export const useAuthenticatorStore
                 subscription_end: endTimestamp,
                 subscription_start: serverTimestamp(),
                 subscription_status: true
+            });
+        }
+
+        async function setAccess(walletAddress, status) {
+            const useRef = collection(db, 'users');
+            const q = query(useRef, where("address", "==", walletAddress));
+            const userSnapshot = await getDocs(q);
+            const documentID = userSnapshot.docs.map(doc => doc.id)[0];
+            const docRef = doc(db, 'users', documentID);
+            await updateDoc(docRef, {
+                access_status: status
             });
         }
 
@@ -162,6 +171,7 @@ export const useAuthenticatorStore
             error,
             getSubscription,
             setSubscription,
+            setAccess,
             getBofiAmount,
             getUser,
             signIn,
