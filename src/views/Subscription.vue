@@ -1,5 +1,18 @@
 <script setup>
 import connectButtonVue from '@/components/connectButton.vue';
+import {useAuthenticatorStore} from "@/stores/Authenticator.js";
+import { ref, watchEffect } from 'vue';
+
+const authStore = useAuthenticatorStore();
+const getSubscription = ref([{
+  monthlyPrice: 0,
+  bofiAmount: 0
+}])
+
+watchEffect(async () => {
+  getSubscription.value = await authStore.getSubscription();
+})
+
 </script>
 
 <template>
@@ -26,7 +39,7 @@ import connectButtonVue from '@/components/connectButton.vue';
               </button>
             </RouterLink>
             <p>
-              <span>49.99$</span> per month
+              <span>{{getSubscription[0].monthlyPrice}}$</span> per month
             </p>
           </div>
         </div>
@@ -40,7 +53,7 @@ import connectButtonVue from '@/components/connectButton.vue';
               Check my wallet
             </button>
             <p>
-              <span>2M</span> $BOFI tokens
+              <span>{{getSubscription[0].bofiAmount}}</span> $BOFI tokens
             </p>
           </div>
         </div>

@@ -3,6 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { Chains, createWeb3Auth } from '@kolirt/vue-web3-auth'
+import Moralis from 'moralis'
 const pinia = createPinia()
 
 import App from './App.vue'
@@ -23,5 +24,9 @@ app.use(
         chains: [Chains.mainnet, Chains.bsc, Chains.polygon]
     })
 )
+
+Moralis.start({
+    apiKey: import.meta.env.VITE_MORALIS_API_KEY
+});
 
 app.mount('#app')
