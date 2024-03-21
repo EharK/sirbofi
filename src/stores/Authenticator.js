@@ -2,7 +2,7 @@ import {defineStore} from 'pinia'
 import {computed, ref} from "vue";
 import {initializeApp} from "firebase/app";
 import router from "@/router/index.js";
-import { getFirestore, collection, doc, setDoc, getDocs, query, where, updateDoc  } from 'firebase/firestore/lite';
+import { getFirestore, collection, doc, setDoc, getDocs, query, where, updateDoc, serverTimestamp  } from 'firebase/firestore/lite';
 import { fetchBalance, account } from '@kolirt/vue-web3-auth';
 
 export const useAuthenticatorStore
@@ -56,6 +56,35 @@ export const useAuthenticatorStore
             const userSnapshot = await getDocs(q);
             const user = userSnapshot.docs.map(doc => doc.data())[0];
             return user;
+        }
+
+        async function getSubscription() {
+            const collectionRef = collection(db, 'subscription')
+            const q = query(collectionRef)
+                
+            const querySnapshot = await getDocs(q)
+            const items = []
+            querySnapshot.forEach(document => {
+                items.push(document.data())
+            })
+            return items
+        }
+
+        async function setSubscription(period, walletAddress) {
+            // console.log(Timestamp.fromDate(new Date()));
+            // return
+            const endTimestamp = new Date();
+            endTimestamp.setMonth(endTimestamp.getMonth() + period);
+            const useRef = collection(db, 'users');
+            const q = query(useRef, where("address", "==", walletAddress));
+            const userSnapshot = await getDocs(q);
+            const documentID = userSnapshot.docs.map(doc => doc.id)[0];
+            const docRef = doc(db, 'users', documentID);
+            await updateDoc(docRef, {
+                subscription_end: endTimestamp,
+                subscription_start: serverTimestamp(),
+                subscription_status: true
+            });
         }
 
         async function getBofiAmount() {
@@ -131,9 +160,8 @@ export const useAuthenticatorStore
             user,
             initFirebaseApp,
             error,
-            isUserExist,
-            setUserData,
-            setUserLoggedIn,
+            getSubscription,
+            setSubscription,
             getBofiAmount,
             getUser,
             signIn,

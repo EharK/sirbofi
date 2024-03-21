@@ -1,6 +1,8 @@
 <template>
   <div class="main-container">
+    <Suspense>
     <RouterView/>
+    </Suspense>
   </div>
 </template>
 

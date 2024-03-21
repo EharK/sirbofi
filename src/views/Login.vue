@@ -1,41 +1,5 @@
 <script setup>
-import {
-  $off,
-  $on,
-  Events,
-  account,
-  connect as masterConnect
-} from '@kolirt/vue-web3-auth';
-import {reactive} from 'vue';
-import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-
-const authStore = useAuthenticatorStore();
-
-const loading = reactive({
-  connecting: false
-});
-
-async function connect(newChain) {
-  const handler = (state) => {
-    if (!state) {
-      loading.connecting = false
-      $off(Events.ModalStateChanged, handler)
-    }
-  }
-
-  $on(Events.ModalStateChanged, handler);
-
-  loading.connecting = true;
-  
-  await masterConnect(newChain);
-
-  const connectedHandler = async () => {
-    await authStore.signIn(account.address)
-    $off(Events.Connected, connectedHandler)
-  }
-
-  $on(Events.Connected, connectedHandler);
-}
+import connectButtonVue from '@/components/connectButton.vue';
 </script>
 
 <template>
@@ -57,11 +21,7 @@ async function connect(newChain) {
           </svg>
 
           <div class="buttons-wrapper">
-            <button @click="connect()">
-              {{ loading.connecting ? 'Connecting...' : 'Connect wallet' }}
-            </button>
-          </div>
-          <div class="buttons-wrapper">
+            <connectButtonVue isSubscription={{false}} />
           </div>
         </div>
       </div>
