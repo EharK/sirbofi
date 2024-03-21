@@ -1,18 +1,35 @@
 <script setup>
-import connectButtonVue from '@/components/connectButton.vue';
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import { ref, watchEffect } from 'vue';
+import Moralis from 'moralis';
+import { account } from '@kolirt/vue-web3-auth';
+import connectButtonVue from '@/components/connectButton.vue';
 
 const authStore = useAuthenticatorStore();
-const getSubscription = ref([{
-  monthlyPrice: 0,
-  bofiAmount: 0
-}])
+const getSubscription = await authStore.getSubscription();
 
-watchEffect(async () => {
-  getSubscription.value = await authStore.getSubscription();
-})
+function isBofi(result) {
+  return result.symbol === "BOFI";
+}
 
+const checkWallet = async () => {
+  try {
+    const response = await Moralis.EvmApi.wallets.getWalletTokenBalancesPrice({
+      "chain": "0x1",
+      "address": account.address
+    });
+    const result = response.raw().result;
+    const bofiBalance = result.find(isBofi).balance_formatted;
+    if(bofiBalance >= getSubscription[0].bofiAmount) {
+      await authStore.setAccess(account.address, true);
+      alert("Now you can access the platform.");
+    } else {
+      await authStore.setAccess(account.address, false);
+      alert("You don't have enough BOFI tokens to access the platform.");
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
 </script>
 
 <template>
@@ -49,9 +66,10 @@ watchEffect(async () => {
             <p>Buy $BOFI once and get unlimited access while holding!</p>
           </div>
           <div class="group flex space-between align-center">
-            <button>
+            <button v-if="account.connected" @click="checkWallet">
               Check my wallet
             </button>
+            <connectButtonVue v-else isSubscription={{true}} />
             <p>
               <span>{{getSubscription[0].bofiAmount}}</span> $BOFI tokens
             </p>

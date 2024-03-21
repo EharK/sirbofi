@@ -192,11 +192,6 @@ const frmtNr = (nr) => {
     maximumFractionDigits: 8,
   }).format(nr)
 }
-
-const response = await Moralis.EvmApi.balance.getNativeBalance({
-    "chain": "0x1",
-    "address": "0xAf9b272Ebf93EC0aE180d4d47c4Ff94f0C06B7ef"
-  });
 </script>
 
 <style scoped>
