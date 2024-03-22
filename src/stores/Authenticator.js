@@ -84,6 +84,7 @@ export const useAuthenticatorStore
                 subscription_status: true
             });
             localStorage.setItem('subscription_status', true);
+            router.push('/');
         }
 
         async function setAccess(walletAddress, status) {
@@ -164,6 +165,9 @@ export const useAuthenticatorStore
                 is_logged_in: false
             });
             setUserLoggedIn(false)
+            localStorage.removeItem("is_logged_in");
+            localStorage.removeItem("access_status");
+            localStorage.removeItem("subscription_status");
             router.push('/login')
         }
 

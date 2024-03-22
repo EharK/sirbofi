@@ -56,11 +56,7 @@ async function connect(newChain) {
       console.error(e);
     }
 
-    if(props.isSubscription) {
-      router.push('/subscription')
-    } else {
-      await authStore.signIn(account.address)
-    }
+    await authStore.signIn(account.address)
     $off(Events.Connected, connectedHandler)
   }
 
