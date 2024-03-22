@@ -9,32 +9,8 @@ export const useAuthenticatorStore
     = defineStore(
     'AuthenticatorStore',
     () => {
-        const user = {
-            is_logged_in: localStorage.getItem('is_logged_in')==='true',
-            access_status: localStorage.getItem('access_status')==='true',
-            subscription_status: localStorage.getItem('subscription_status')==='true'
-        }
-
         let db = null
-
-        function setUserData(user) {
-            localStorage.setItem('is_logged_in', user.is_logged_in);
-            localStorage.setItem('access_status', user.access_status);
-            localStorage.setItem('subscription_status', user.subscription_status);
-            user = user
-        }
-
-        function setUserLoggedIn(logged_in) {
-            localStorage.setItem('is_logged_in', logged_in);
-            user.is_logged_in = logged_in
-        }
-
         const error = ref(null)
-
-        const getUser = computed(
-            () =>
-                user
-        )
 
         const initFirebaseApp = async () => {
             const firebaseConfig = {
@@ -83,7 +59,6 @@ export const useAuthenticatorStore
                 subscription_start: serverTimestamp(),
                 subscription_status: true
             });
-            localStorage.setItem('subscription_status', true);
             router.push('/');
         }
 
@@ -96,7 +71,6 @@ export const useAuthenticatorStore
             await updateDoc(docRef, {
                 access_status: status
             });
-            localStorage.setItem('access_status', status);
             if(status)
                 router.push('/');
         }
@@ -149,10 +123,7 @@ export const useAuthenticatorStore
                     address: walletAddress
                 }
             }
-            setUserData(data)
-            setUserLoggedIn(true)
             router.push('/')
-            return user
         }
 
         const signOut = async (walletAddress) => {
@@ -164,22 +135,17 @@ export const useAuthenticatorStore
             await updateDoc(docRef, {
                 is_logged_in: false
             });
-            setUserLoggedIn(false)
-            localStorage.removeItem("is_logged_in");
-            localStorage.removeItem("access_status");
-            localStorage.removeItem("subscription_status");
             router.push('/login')
         }
 
         return {
-            user,
             initFirebaseApp,
             error,
+            isUserExist,
             getSubscription,
             setSubscription,
             setAccess,
             getBofiBalance,
-            getUser,
             signIn,
             signOut
         }
