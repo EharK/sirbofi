@@ -37,9 +37,9 @@ const router = createRouter({
 
 
 router.beforeEach(async (to, from, next) => {
-    const authStore = useAuthenticatorStore()
+    const authStore = useAuthenticatorStore();
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (authStore.getUser.is_logged_in) {
+        if (authStore.getUser.subscription_status || authStore.getUser.access_status) {
             next()
         } else {
             next({name: 'login'})
