@@ -27,6 +27,8 @@ export const useAuthenticatorStore
         }
 
         async function isUserExist(address) {
+            if(!account.address)
+                return []
             const useRef = collection(db, 'users');
             const q = query(useRef, where("address", "==", address));
             const userSnapshot = await getDocs(q);
