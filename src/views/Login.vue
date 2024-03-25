@@ -1,5 +1,8 @@
 <script setup>
 import connectButtonVue from '@/components/connectButton.vue';
+if(!sessionStorage.connected) {
+  localStorage.clear();
+}
 </script>
 
 <template>
@@ -21,7 +24,7 @@ import connectButtonVue from '@/components/connectButton.vue';
           </svg>
 
           <div class="buttons-wrapper">
-            <connectButtonVue :is-subscription="false" />
+            <connectButtonVue />
           </div>
         </div>
       </div>

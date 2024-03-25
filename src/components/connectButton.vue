@@ -8,10 +8,6 @@ import {
 } from '@kolirt/vue-web3-auth';
 import {reactive} from 'vue';
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import router from "@/router/index.js";
-import Moralis from 'moralis';
-
-const props = defineProps(['isSubscription'])
 
 const authStore = useAuthenticatorStore();
 
@@ -20,10 +16,6 @@ const loading = reactive({
 });
 
 const getSubscription = await authStore.getSubscription();
-
-function isBofi(result) {
-  return result.symbol === "BOFI";
-}
 
 async function connect(newChain) {
   const handler = (state) => {
@@ -40,20 +32,11 @@ async function connect(newChain) {
   await masterConnect(newChain);
 
   const connectedHandler = async () => {
-    try {
-      const response = await Moralis.EvmApi.wallets.getWalletTokenBalancesPrice({
-        "chain": "0x1",
-        "address": account.address
-      });
-      const result = response.raw().result;
-      const bofiBalance = result.find(isBofi).balance_formatted;
-      if(bofiBalance >= getSubscription[0].bofiAmount) {
-        await authStore.setAccess(account.address, true);
-      } else {
-        await authStore.setAccess(account.address, false);
-      }
-    } catch (e) {
-      console.error(e);
+    const bofiBalance = await authStore.getBofiBalance();
+    if(bofiBalance >= getSubscription[0].bofiAmount) {
+      await authStore.setAccess(account.address, true);
+    } else {
+      await authStore.setAccess(account.address, false);
     }
 
     await authStore.signIn(account.address)
