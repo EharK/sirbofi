@@ -27,7 +27,7 @@ export const useAuthenticatorStore
         }
 
         async function isUserExist(address) {
-            if(!account.address)
+            if(!sessionStorage.connected)
                 return []
             const useRef = collection(db, 'users');
             const q = query(useRef, where("address", "==", address));
@@ -125,6 +125,7 @@ export const useAuthenticatorStore
                     address: walletAddress
                 }
             }
+            sessionStorage.setItem("connected", "connected");
             router.push('/')
         }
 
