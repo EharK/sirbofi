@@ -21,7 +21,7 @@ const checkWallet = async () => {
 <template>
   <div class="main-container">
     <div class="top-buttons-wrapper">
-      <connectButtonVue :is-subscription="true" />
+      <connectButtonVue />
     </div>
     <div class="title-and-options">
       <h1>Choose your plan</h1>
@@ -58,7 +58,7 @@ const checkWallet = async () => {
               </button>
             </div>
             <div v-else>
-              <connectButtonVue :is-subscription="true" />
+              <connectButtonVue />
             </div>
             <p>
               <span>{{getSubscription[0].bofiAmount}}</span> $BOFI tokens

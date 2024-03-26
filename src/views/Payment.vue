@@ -55,7 +55,7 @@
               <span class="text-green">{{ account.shortAddress }}</span>
             </div>
             <div v-else>
-              <connectButtonVue :is-subscription="true" />
+              <connectButtonVue />
             </div>
           </div>
         </div>
