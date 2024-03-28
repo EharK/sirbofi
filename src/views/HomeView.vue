@@ -684,11 +684,11 @@ button.filter-pad-top-nav-button {
 .all-ops {
   display: flex;
   flex-direction: column;
-  padding: 80px 40px;
+  padding: 20px 40px;
   width: 100%;
   gap: 60px;
   min-height: 0;
-  height: 100vh;
+  height: calc(100vh - 60px);
   overflow-y: auto;
   min-width: 650px;
 }
