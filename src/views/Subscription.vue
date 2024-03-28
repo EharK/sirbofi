@@ -1,14 +1,15 @@
 <script setup>
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import { account } from '@kolirt/vue-web3-auth';
+import {account} from '@kolirt/vue-web3-auth';
 import connectButtonVue from '@/components/connectButton.vue';
+import OutsideNavbar from "@/components/OutsideNavbar.vue";
 
 const authStore = useAuthenticatorStore();
 const getSubscription = await authStore.getSubscription();
 
 const checkWallet = async () => {
   const bofiBalance = await authStore.getBofiBalance();
-  if(bofiBalance >= getSubscription[0].bofiAmount) {
+  if (bofiBalance >= getSubscription[0].bofiAmount) {
     await authStore.setAccess(account.address, true);
     alert("Now you can access the platform.");
   } else {
@@ -20,9 +21,18 @@ const checkWallet = async () => {
 
 <template>
   <div class="main-container">
-    <div class="top-buttons-wrapper">
-      <connectButtonVue />
-    </div>
+    <OutsideNavbar>
+      <div class="left">
+        <router-link to="/login">
+          <button>
+            Back
+          </button>
+        </router-link>
+      </div>
+      <div class="right">
+        <connectButtonVue/>
+      </div>
+    </OutsideNavbar>
     <div class="title-and-options">
       <h1>Choose your plan</h1>
       <div class="options-container">
@@ -37,12 +47,12 @@ const checkWallet = async () => {
           </div>
           <div class="group flex space-between align-center">
             <RouterLink to="/payment"> <!-- Add a router link to the payment page -->
-              <button>
+              <button class="cta">
                 Subscribe
               </button>
             </RouterLink>
             <p>
-              <span>{{getSubscription[0].monthlyPrice}}$</span> per month
+              <span>{{ getSubscription[0].monthlyPrice }}$</span> per month
             </p>
           </div>
         </div>
@@ -58,10 +68,10 @@ const checkWallet = async () => {
               </button>
             </div>
             <div v-else>
-              <connectButtonVue />
+              <connectButtonVue/>
             </div>
             <p>
-              <span>{{getSubscription[0].bofiAmount}}</span> $BOFI tokens
+              <span>{{ getSubscription[0].bofiAmount }}</span> $BOFI tokens
             </p>
           </div>
         </div>
@@ -71,15 +81,6 @@ const checkWallet = async () => {
 </template>
 
 <style scoped>
-
-.top-buttons-wrapper {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 20px;
-  width: 100%;
-}
 
 ul {
   padding: 0;

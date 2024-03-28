@@ -697,7 +697,6 @@ button.filter-pad-top-nav-button {
   display: flex;
   flex-direction: column;
   padding: 0 40px 40px;
-  border: 1px solid var(--slight);
   background-color: var(--black);
   border-radius: 8px;
   text-align: center;
@@ -765,7 +764,6 @@ button.filter-pad-top-nav-button {
 .op-table-headers .exchange-link-header {
   min-width: 75px;
   width: 180px;
-  height: 40px;
   overflow: hidden;
 }
 

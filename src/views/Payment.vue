@@ -2,6 +2,11 @@
   <div class="loading-wrapper" v-if="transactionStatus">
     <loading-spinner v-if="transactionStatus"/>
   </div>
+  <OutsideNavbar>
+    <RouterLink to="/Subscription">
+      <button>Back</button>
+    </RouterLink>
+  </OutsideNavbar>
   <div class="main-container">
     <div class="payment-section-sides-wrapper">
       <div class="payment-wrapper left-side option flex column">
@@ -12,9 +17,6 @@
           <li>600+ exchanges</li>
           <li>9000+ cryptocurrencies</li>
         </ul>
-        <router-link to="/subscription">
-          <button>{{ "Available plans" }}</button>
-        </router-link>
       </div>
       <div class="vr" aria-hidden="true"></div>
       <div class="payment-wrapper option flex column">
@@ -86,6 +88,7 @@ import { computed, ref } from "vue";
 import { account, sendTransaction, waitForTransaction, erc20ABI, writeContract } from '@kolirt/vue-web3-auth';
 import Moralis from 'moralis';
 import { useAuthenticatorStore } from "@/stores/Authenticator.js";
+import OutsideNavbar from "@/components/OutsideNavbar.vue";
 
 const authStore = useAuthenticatorStore();
 const getSubscription = await authStore.getSubscription().catch(error => {
