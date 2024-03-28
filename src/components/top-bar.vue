@@ -60,7 +60,7 @@ async function signOutHandler(walletAddress) {
   justify-content: space-between;
   align-items: center;
   padding: 12px 40px;
-  backdrop-filter: blur(10px) brightness(0.8);
+  backdrop-filter: blur(10px) brightness(0.5);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   transition: opacity 0.1s ease-in-out;
   z-index: 100;

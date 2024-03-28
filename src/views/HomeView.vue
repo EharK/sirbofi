@@ -660,7 +660,7 @@ input {
   padding: 1rem 2rem;
   border-radius: 4px;
   width: inherit;
-  backdrop-filter:  blur(10px) brightness(0.8);
+  backdrop-filter:  blur(10px) brightness(0.4);
   z-index: 9;
 }
 
