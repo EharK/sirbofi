@@ -111,12 +111,14 @@ h2 {
 button {
     cursor: pointer;
     outline: none;
-    border: 1px solid var(--light);
+    /*border: 1px solid var(--slight);*/
+    border: 0;
     background-color: transparent;
+    backdrop-filter: brightness(0.8);
     color: var(--light);
     border-radius: 4px;
     padding: 8px 16px;
-    transition: background 0.1s ease-in-out, width 1s ease-in-out;
+    transition: background 0.1s ease-in-out, width 1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out;
     user-select: none;
     display: flex;
     align-items: center;
@@ -166,7 +168,7 @@ button.round {
 }
 
 button.toggle-button {
-    border-color: var(--slight);
+    border: 1px solid var(--slight);
     transition: border-color 0.5s ease-in-out;
 }
 

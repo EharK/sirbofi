@@ -1,24 +1,26 @@
 <template>
   <div class="top-bar-container">
-    <span class="current-user">
-      <button>{{ account.shortAddress }}</button>
-    </span>
-    <span class="buttons-wrapper">
-      <button @click="signOutHandler(account.address)">{{ loading.logouting ? 'Logouting...' : 'Log out' }}</button>
-    </span>
+    <div class="top-bar-content-wrapper">
+      <span class="current-user">
+        <button>{{ account.shortAddress }}</button>
+      </span>
+      <span class="buttons-wrapper">
+        <button @click="signOutHandler(account.address)">{{ loading.logouting ? 'Logouting...' : 'Log out' }}</button>
+      </span>
+    </div>
   </div>
 </template>
 
 <script setup>
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import { account } from '@kolirt/vue-web3-auth';
+import {account} from '@kolirt/vue-web3-auth';
 import {
   $off,
   $on,
   Events,
   disconnect as masterDisconnect
 } from '@kolirt/vue-web3-auth';
-import { reactive } from 'vue';
+import {reactive} from 'vue';
 
 const authStore = useAuthenticatorStore();
 
@@ -46,21 +48,23 @@ async function signOutHandler(walletAddress) {
 <style scoped>
 
 .top-bar-container {
+  position: relative;
+  width: 100%;
+}
+
+.top-bar-content-wrapper {
+  position: absolute;
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 40px;
-  background-color: #1a1a1a;
-  position: sticky;
-  opacity: 0.4;
+  padding: 12px 40px;
+  backdrop-filter: blur(10px) brightness(0.8);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   transition: opacity 0.1s ease-in-out;
   z-index: 100;
   white-space: nowrap;
-}
-
-.top-bar-container:hover {
-  opacity: 1;
 }
 
 .buttons-wrapper {

@@ -162,25 +162,25 @@
             <h2 class="crypto-section-title">{{ crypto }}</h2>
             <div class="op-table-headers">
               <div class="text exchange-link-header">
-                Buy from
+                Buy From
               </div>
               <div class="text price-header">
-                price
+                Price
               </div>
               <div class="text volume-header">
-                24h volume
+                24h Volume
               </div>
               <div class="text profit-percentage-header">
-                gap
+                Gap
               </div>
               <div class="text volume-header">
-                24h volume
+                24h Volume
               </div>
               <div class="text price-header">
-                price
+                Price
               </div>
               <div class="text exchange-link-header">
-                Sell to
+                Sell To
               </div>
             </div>
             <div class="op" v-for="op in opportunities[crypto]">
@@ -602,6 +602,8 @@ input {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background: linear-gradient(180deg, #262626, #151515);
+  z-index: 9;
 }
 
 .main-board {
@@ -658,7 +660,7 @@ input {
   padding: 1rem 2rem;
   border-radius: 4px;
   width: inherit;
-  backdrop-filter: blur(4px) brightness(0.4);
+  backdrop-filter:  blur(10px) brightness(0.8);
   z-index: 9;
 }
 
@@ -682,11 +684,11 @@ button.filter-pad-top-nav-button {
 .all-ops {
   display: flex;
   flex-direction: column;
-  padding: 20px 40px;
+  padding: 80px 40px;
   width: 100%;
   gap: 60px;
   min-height: 0;
-  height: calc(100vh - 100px);
+  height: 100vh;
   overflow-y: auto;
   min-width: 650px;
 }
@@ -694,8 +696,9 @@ button.filter-pad-top-nav-button {
 .ops-per-crypto {
   display: flex;
   flex-direction: column;
-  padding: 0 40px;
+  padding: 0 40px 40px;
   border: 1px solid var(--slight);
+  background-color: var(--black);
   border-radius: 8px;
   text-align: center;
   min-height: max-content;
@@ -736,6 +739,15 @@ button.filter-pad-top-nav-button {
   white-space: nowrap;
 }
 
+.op .profit-percentage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--light-green);
+  height: 40px;
+  border-radius: 4px;
+}
+
 .op .indicator.price,
 .op .indicator.volume,
 .op-table-headers .price-header,
@@ -752,7 +764,8 @@ button.filter-pad-top-nav-button {
 .op button.exchange-link,
 .op-table-headers .exchange-link-header {
   min-width: 75px;
-  width: 200px;
+  width: 180px;
+  height: 40px;
   overflow: hidden;
 }
 
