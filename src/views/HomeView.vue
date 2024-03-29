@@ -215,7 +215,7 @@
               <li>Wait for results to load</li>
             </ul>
           </div>
-          <div v-if="scraping">
+          <div class="results-spinner-container" v-if="scraping">
             <loading-spinner :size="64"/>
           </div>
         </div>
@@ -589,6 +589,14 @@ ul {
   align-items: center;
 }
 
+.results-spinner-container {
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .text-tiny {
   font-size: 0.8rem;
 }
@@ -706,7 +714,6 @@ button.filter-pad-top-nav-button {
 .crypto-section-title {
   font-size: 1.5rem;
   padding: 20px 0;
-  border-bottom: 1px solid var(--slight);
   text-align: center;
   color: var(--light);
 }
@@ -718,6 +725,8 @@ button.filter-pad-top-nav-button {
   align-items: center;
   gap: 12px;
   padding: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
 
 .op {
@@ -745,6 +754,7 @@ button.filter-pad-top-nav-button {
   background-color: var(--light-green);
   height: 40px;
   border-radius: 4px;
+  pointer-events: none  ;
 }
 
 .op .indicator.price,
