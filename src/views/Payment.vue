@@ -11,7 +11,7 @@
     <div class="payment-section-sides-wrapper">
       <div class="payment-wrapper left-side option flex column">
         <img src="@/assets/icons/logo.ico" alt="sirbofi-logo" width="64px" aria-hidden="true">
-        <h2>12 months of unlimited access</h2>
+        <h2>{{ selected_period }} month{{ selected_period > 1 ? "s" : "" }} of unlimited access</h2>
         <ul>
           <li>Fastest in the market</li>
           <li>600+ exchanges</li>

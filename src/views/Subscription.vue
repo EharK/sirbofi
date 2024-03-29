@@ -52,7 +52,7 @@ const checkWallet = async () => {
               </button>
             </RouterLink>
             <p>
-              <span>{{ getSubscription[0].monthlyPrice }}$</span> per month
+              <span class="text-green">{{ getSubscription[0].monthlyPrice }}$</span> per month
             </p>
           </div>
         </div>
@@ -71,7 +71,7 @@ const checkWallet = async () => {
               <connectButtonVue/>
             </div>
             <p>
-              <span>{{ getSubscription[0].bofiAmount }}</span> $BOFI tokens
+              <span class="text-green">{{ getSubscription[0].bofiAmount * 0.000001 }}M</span> $BOFI tokens
             </p>
           </div>
         </div>
