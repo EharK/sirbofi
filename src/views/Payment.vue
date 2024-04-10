@@ -1,59 +1,80 @@
 <template>
+  <div class="loading-wrapper" v-if="transactionStatus">
+    <loading-spinner v-if="transactionStatus"/>
+  </div>
+  <OutsideNavbar>
+    <RouterLink to="/Subscription">
+      <button>Back</button>
+    </RouterLink>
+  </OutsideNavbar>
   <div class="main-container">
     <div class="payment-section-sides-wrapper">
       <div class="payment-wrapper left-side option flex column">
-        <img src="@/assets/icons/logo.ico" alt="sirbofi-logo" width="64px">
-        <h2>
-          12 months of unlimited access
-        </h2>
+        <img src="@/assets/icons/logo.ico" alt="sirbofi-logo" width="64px" aria-hidden="true">
+        <h2>{{ selected_period }} month{{ selected_period > 1 ? "s" : "" }} of unlimited access</h2>
         <ul>
           <li>Fastest in the market</li>
           <li>600+ exchanges</li>
-          <li>9000+ crypto currencies</li>
+          <li>9000+ cryptocurrencies</li>
         </ul>
-        <router-link to="/subscription">
-          <button>
-            {{ "Available plans" }}
-          </button>
-        </router-link>
       </div>
-      <div class="vr"></div>
+      <div class="vr" aria-hidden="true"></div>
       <div class="payment-wrapper option flex column">
-        <img src="@/assets/icons/logo.ico" alt="sirbofi-logo" style="opacity: 0" width="64px">
+        <img src="@/assets/icons/logo.ico" alt="sirbofi-logo" style="opacity: 0" width="64px" aria-hidden="true">
+        <h2>Welcome to Sir Bofi!</h2>
         <div class="group flex column gap-8">
-          <h2>Welcome to Sir Bofi!</h2>
-          <div>Select payment currency <span class="text-red">*</span></div>
+          <div>{{ "Period: " }}<span class="text-red">*</span></div>
           <div class="flex row gap-8">
-            <button class="toggle-button uppercase"
-                    @click="togglePaymentOption(payment_options[opt])"
-                    :class="{'selected': opt===selected_payment}"
-                    v-for="opt in payment_options">
+            <button
+              class="toggle-button uppercase"
+              @click="togglePeriodOption(period)"
+              :class="{'selected': period===selected_period}"
+              :key="period"
+              v-for="period in period_options"
+            >
+              {{ period + " month" + (period > 1 ? "s" : "") }}
+            </button>
+          </div>
+        </div>
+        <div class="group flex column gap-8">
+          <div>Payment currency <span class="text-red">*</span></div>
+          <div class="flex row gap-8">
+            <button
+              class="toggle-button uppercase"
+              @click="togglePaymentOption(opt)"
+              :class="{'selected': opt===selected_payment}"
+              v-for="(opt, key) in payment_options"
+              :key="key"
+            >
               {{ opt }}
             </button>
           </div>
         </div>
         <div class="group flex column gap-8">
+          <div>{{ "Wallet: " }}<span class="text-red">*</span></div>
           <div>
-            currently selected wallet:
-          </div>
-          <div>
-            <span class="text-green" v-if="selected_wallet">{{ selected_wallet }}</span>
-            <button v-else>
-              Connect wallet
-            </button>
+            <div v-if="account.connected">
+              <span class="text-green">{{ account.shortAddress }}</span>
+            </div>
+            <div v-else>
+              <connectButtonVue />
+            </div>
           </div>
         </div>
         <hr>
         <div class="group flex space-between align-center"
-             :class="{'disabled': !selected_payment}">
-          <h3>
-            <div v-if="selected_payment">
-              Send <span class="text-green blur">{{ amount_to_be_paid }}</span> {{ selected_payment.toUpperCase() }}
+             :class="{'disabled': !selected_payment || !selected_period || !account.connected}">
+          <h3 v-if="selected_payment">
+            <div>
+              Send {{ amount_to_be_paid + "$" }}
+            </div>
+            <div class="text">
+              {{ "Amounts to " }}
+              <span class="text-green">{{ frmtNr(amount_to_payment) }}</span>
+              {{ " " + selected_payment.toUpperCase() }}
             </div>
           </h3>
-          <button class="cta">
-            Send payment
-          </button>
+          <button class="cta" @click="sendPayment" :disabled="!selected_payment || !selected_period || !account.connected">Send payment</button>
         </div>
       </div>
     </div>
@@ -61,21 +82,119 @@
 </template>
 
 <script setup>
+import connectButtonVue from '@/components/connectButton.vue';
+import LoadingSpinner from "@/components/loadingSpinner.vue";
+import { computed, ref } from "vue";
+import { account, sendTransaction, waitForTransaction, erc20ABI, writeContract } from '@kolirt/vue-web3-auth';
+import Moralis from 'moralis';
+import { useAuthenticatorStore } from "@/stores/Authenticator.js";
+import OutsideNavbar from "@/components/OutsideNavbar.vue";
 
-import {ref} from "vue";
+const authStore = useAuthenticatorStore();
+const getSubscription = await authStore.getSubscription().catch(error => {
+  console.error("Error fetching subscription:", error);
+  return [];
+});
 
+const period_options = [1, 3, 6, 12];  // months
+const selected_period = ref(1);
+const transactionStatus = ref(false)
 const payment_options = {
   eth: "eth",
   bofi: "bofi"
 }
-const selected_payment = ref(payment_options.ethereum);
-const amount_to_be_paid = ref(299);
-const selected_wallet = ref(null);
+const selected_payment = ref(payment_options.bofi);
+
+const getPrices = async () => {
+  try {
+    const response = await Moralis.EvmApi.token.getMultipleTokenPrices({
+      "chain": "0x1",
+      "include": "percent_change"
+    },{
+      "tokens": [
+        {
+          "tokenAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+        },
+        {
+          "tokenAddress": "0xe3374f14Be081EAe24E39E18360422b7AA769859"
+        }
+      ]
+    });
+
+    return [response.result[0]?.usdPrice || 0, response.result[1]?.usdPrice || 0];
+  } catch (error) {
+    console.error("Error fetching token prices:", error);
+    return [0, 0];
+  }
+}
+
+const tokenPrices = await getPrices();
+
+const amount_to_be_paid = computed(
+  () => selected_period.value * (getSubscription[0]?.monthlyPrice || 0)
+)
+
+const amount_to_payment = computed(
+  () => {
+    let payment_currency_rate = null;
+    if (selected_payment.value === payment_options.eth) {
+      payment_currency_rate = tokenPrices[0];
+    } else if (selected_payment.value === payment_options.bofi) {
+      payment_currency_rate = tokenPrices[1];
+    }
+    return (amount_to_be_paid.value / payment_currency_rate).toPrecision(8)
+  }
+)
 
 const togglePaymentOption = (option) => {
   selected_payment.value = option;
 }
 
+const togglePeriodOption = (option) => {
+  selected_period.value = option;
+}
+
+const sendPayment = async () => {
+  transactionStatus.value = true;
+  if(selected_payment.value === payment_options.eth) {
+    const tx = await sendTransaction({
+      to: import.meta.env.VITE_WALLET_ADDRESS,
+      value: Moralis.Core.BigNumber.fromDecimal(amount_to_payment.value, 18)
+    }).catch(error => {
+      console.log(error)
+      transactionStatus.value = false;
+    });
+
+    await waitForTransaction({
+      hash: tx.hash,
+    }).then(async (transactionReceipt) => {
+      await authStore.setSubscription(selected_period.value, account.address);
+      transactionStatus.value = false;
+    });
+  } else {
+    await writeContract({
+      abi: erc20ABI,
+      address: '0xe3374f14Be081EAe24E39E18360422b7AA769859',
+      functionName: 'transfer',
+      args: [import.meta.env.VITE_WALLET_ADDRESS, Moralis.Core.BigNumber.fromDecimal(amount_to_payment.value, 9)]
+    }).then(async (data) => {
+      // console.log('hash', data.hash)
+      await data.wait()
+      await authStore.setSubscription(selected_period.value, account.address);
+      transactionStatus.value = false;
+      // console.log('transaction successfully')
+    }).catch(error => {
+      console.log(error)
+      transactionStatus.value = false;
+    });
+  }
+}
+
+const frmtNr = (nr) => {
+  return Intl.NumberFormat("en", {
+    maximumFractionDigits: 8,
+  }).format(nr)
+}
 </script>
 
 <style scoped>
@@ -92,6 +211,17 @@ const togglePaymentOption = (option) => {
   height: 100vh;
   width: 100%;
   overflow: auto;
+  font-size: clamp(0.5rem, 1.4vw, 1rem);
+}
+
+.loading-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgb(0 0 0 / 73%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .payment-section-sides-wrapper {
@@ -101,7 +231,7 @@ const togglePaymentOption = (option) => {
   height: 80vh;
   gap: 4rem;
   width: 100%;
-  padding: 10rem 4rem;
+  padding: 6rem 4rem;
 }
 
 .payment-wrapper {

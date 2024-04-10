@@ -162,25 +162,25 @@
             <h2 class="crypto-section-title">{{ crypto }}</h2>
             <div class="op-table-headers">
               <div class="text exchange-link-header">
-                Buy from
+                Buy From
               </div>
               <div class="text price-header">
-                price
+                Price
               </div>
               <div class="text volume-header">
-                24h volume
+                24h Volume
               </div>
               <div class="text profit-percentage-header">
-                gap
+                Gap
               </div>
               <div class="text volume-header">
-                24h volume
+                24h Volume
               </div>
               <div class="text price-header">
-                price
+                Price
               </div>
               <div class="text exchange-link-header">
-                Sell to
+                Sell To
               </div>
             </div>
             <div class="op" v-for="op in opportunities[crypto]">
@@ -215,7 +215,7 @@
               <li>Wait for results to load</li>
             </ul>
           </div>
-          <div v-if="scraping">
+          <div class="results-spinner-container" v-if="scraping">
             <loading-spinner :size="64"/>
           </div>
         </div>
@@ -230,7 +230,6 @@ import LoadingSpinner from "@/components/loadingSpinner.vue";
 import {computed, onMounted, ref} from "vue";
 import axios from "axios";
 
-const nFormat = new Intl.NumberFormat();
 const api_base_address = 'https://data.sirbofi.com'
 const api_unreachable_error = "Couldn't access API."
 
@@ -590,6 +589,14 @@ ul {
   align-items: center;
 }
 
+.results-spinner-container {
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .text-tiny {
   font-size: 0.8rem;
 }
@@ -603,6 +610,8 @@ input {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background: linear-gradient(180deg, #262626, #151515);
+  z-index: 9;
 }
 
 .main-board {
@@ -659,7 +668,7 @@ input {
   padding: 1rem 2rem;
   border-radius: 4px;
   width: inherit;
-  backdrop-filter: blur(4px) brightness(0.4);
+  backdrop-filter:  blur(10px) brightness(0.4);
   z-index: 9;
 }
 
@@ -687,7 +696,7 @@ button.filter-pad-top-nav-button {
   width: 100%;
   gap: 60px;
   min-height: 0;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 60px);
   overflow-y: auto;
   min-width: 650px;
 }
@@ -695,8 +704,8 @@ button.filter-pad-top-nav-button {
 .ops-per-crypto {
   display: flex;
   flex-direction: column;
-  padding: 0 40px;
-  border: 1px solid var(--slight);
+  padding: 0 40px 40px;
+  background-color: var(--black);
   border-radius: 8px;
   text-align: center;
   min-height: max-content;
@@ -705,7 +714,6 @@ button.filter-pad-top-nav-button {
 .crypto-section-title {
   font-size: 1.5rem;
   padding: 20px 0;
-  border-bottom: 1px solid var(--slight);
   text-align: center;
   color: var(--light);
 }
@@ -717,6 +725,8 @@ button.filter-pad-top-nav-button {
   align-items: center;
   gap: 12px;
   padding: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
 
 .op {
@@ -737,6 +747,16 @@ button.filter-pad-top-nav-button {
   white-space: nowrap;
 }
 
+.op .profit-percentage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--light-green);
+  height: 40px;
+  border-radius: 4px;
+  pointer-events: none  ;
+}
+
 .op .indicator.price,
 .op .indicator.volume,
 .op-table-headers .price-header,
@@ -753,7 +773,7 @@ button.filter-pad-top-nav-button {
 .op button.exchange-link,
 .op-table-headers .exchange-link-header {
   min-width: 75px;
-  width: 200px;
+  width: 180px;
   overflow: hidden;
 }
 

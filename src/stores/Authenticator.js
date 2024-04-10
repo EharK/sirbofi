@@ -1,42 +1,18 @@
 import {defineStore} from 'pinia'
-import {
-    browserSessionPersistence, getAuth,
-    onAuthStateChanged,
-    setPersistence,
-    signInWithEmailAndPassword
-} from 'firebase/auth'
 import {computed, ref} from "vue";
 import {initializeApp} from "firebase/app";
 import router from "@/router/index.js";
-
+import { getFirestore, collection, doc, setDoc, getDocs, query, where, updateDoc, serverTimestamp  } from 'firebase/firestore/lite';
+import { fetchBalance, account } from '@kolirt/vue-web3-auth';
 
 export const useAuthenticatorStore
     = defineStore(
     'AuthenticatorStore',
     () => {
-        const user = {
-            is_logged_in: false,
-            data: null
-        }
-        let authInitialized = false
-        let auth = null
-
-        function setUserData(data) {
-            user.data = data
-        }
-
-        function setUserLoggedIn(logged_in) {
-            user.is_logged_in = logged_in
-        }
-
+        let db = null
         const error = ref(null)
-        const getUser = computed(
-            () =>
-                user
-        )
-        const confirming_user = ref(true)
 
-        const initAuth = async () => {
+        const initFirebaseApp = async () => {
             const firebaseConfig = {
                 apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
                 authDomain: "aoft-de2ab.firebaseapp.com",
@@ -46,58 +22,133 @@ export const useAuthenticatorStore
                 appId: "1:630650035711:web:210507afd411fc5cb91bca",
                 measurementId: "G-W5TJ6PV4GV"
             };
-            initializeApp(firebaseConfig);
-            auth = getAuth()
-            onAuthStateChanged(auth, (user) => {
-                confirming_user.value = false
-                if (user) {
-                    setUserData(user)
-                    setUserLoggedIn(true)
-                    router.push('/')
-                } else {
-                    setUserLoggedIn(false)
-                    router.push('/login')
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        }
+
+        async function isUserExist(address) {
+            if(!sessionStorage.connected)
+                return []
+            const useRef = collection(db, 'users');
+            const q = query(useRef, where("address", "==", address));
+            const userSnapshot = await getDocs(q);
+            const user = userSnapshot.docs.map(doc => doc.data())[0];
+            return user;
+        }
+
+        async function getSubscription() {
+            const collectionRef = collection(db, 'subscription')
+            const q = query(collectionRef)
+
+            const querySnapshot = await getDocs(q)
+            const items = []
+            querySnapshot.forEach(document => {
+                items.push(document.data())
+            })
+            return items
+        }
+
+        async function setSubscription(period, walletAddress) {
+            const endTimestamp = new Date();
+            endTimestamp.setMonth(endTimestamp.getMonth() + period);
+            const useRef = collection(db, 'users');
+            const q = query(useRef, where("address", "==", walletAddress));
+            const userSnapshot = await getDocs(q);
+            const documentID = userSnapshot.docs.map(doc => doc.id)[0];
+            const docRef = doc(db, 'users', documentID);
+            await updateDoc(docRef, {
+                subscription_end: endTimestamp,
+                subscription_start: serverTimestamp(),
+                subscription_status: true
+            });
+            router.push('/');
+        }
+
+        async function setAccess(walletAddress, status) {
+            const useRef = collection(db, 'users');
+            const q = query(useRef, where("address", "==", walletAddress));
+            const userSnapshot = await getDocs(q);
+            const documentID = userSnapshot.docs.map(doc => doc.id)[0];
+            const docRef = doc(db, 'users', documentID);
+            await updateDoc(docRef, {
+                access_status: status
+            });
+            if(status)
+                router.push('/');
+        }
+
+        async function getBofiBalance() {
+            const { formatted } = await fetchBalance({
+                address: account.address,
+                token: '0xe3374f14Be081EAe24E39E18360422b7AA769859'
+            })
+            return formatted;
+        }
+
+        const signIn = async (walletAddress) => {
+            let data = {
+                is_logged_in: false,
+                access_status: false,
+                bofiAmount: 0,
+                subscription_end: null,
+                subscription_start: null,
+                subscription_status: false,
+                address: null
+            }
+            const userExists = await isUserExist(walletAddress);
+            const bofiAmount = await getBofiBalance();
+            if(!userExists) {
+                const newUserRef = doc(collection(db, "users"));
+                data = {
+                    is_logged_in: true,
+                    bofiAmount: bofiAmount,
+                    address: walletAddress
                 }
-            })
-            authInitialized = true
+                await setDoc(newUserRef, data);
+            } else {
+                const useRef = collection(db, 'users');
+                const q = query(useRef, where("address", "==", walletAddress));
+                const userSnapshot = await getDocs(q);
+                const documentID = userSnapshot.docs.map(doc => doc.id)[0];
+                const docRef = doc(db, 'users', documentID);
+                await updateDoc(docRef, {
+                    is_logged_in: true,
+                    bofiAmount: bofiAmount
+                });
+                data = {
+                    is_logged_in: true,
+                    bofiAmount: bofiAmount,
+                    access_status: userExists.access_status,
+                    subscription_end: userExists.subscription_end,
+                    subscription_start: userExists.subscription_start,
+                    subscription_status: userExists.subscription_status,
+                    address: walletAddress
+                }
+            }
+            sessionStorage.setItem("connected", "connected");
+            router.push('/')
         }
-        const getAuthInitStatus = computed(
-            () =>
-                authInitialized
-        )
-        const getAuthFromStore = computed(
-            () =>
-                auth
-        )
-        const signIn = async (email, password) => {
-            await signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    setUserData(userCredential.user)
-                    setUserLoggedIn(true)
-                }).catch((error) => {
-                    console.log(error.message)
-                    error.value = error.message
-                })
-            return user
+
+        const signOut = async (walletAddress) => {
+            const useRef = collection(db, 'users');
+            const q = query(useRef, where("address", "==", walletAddress));
+            const userSnapshot = await getDocs(q);
+            const documentID = userSnapshot.docs.map(doc => doc.id)[0];
+            const docRef = doc(db, 'users', documentID);
+            await updateDoc(docRef, {
+                is_logged_in: false
+            });
+            router.push('/login')
         }
-        const signOut = async (auth) => {
-            await auth.signOut().then(() => {
-                setUserLoggedIn(false)
-            }).catch((error) => {
-                console.log(error.message)
-                error.value = error.message
-            })
-        }
+
         return {
-            user,
-            initAuth,
+            initFirebaseApp,
             error,
-            getAuthInitStatus,
-            getAuthFromStore,
-            setUserData,
-            confirming_user,
-            setUserLoggedIn,
-            getUser,
+            isUserExist,
+            getSubscription,
+            setSubscription,
+            setAccess,
+            getBofiBalance,
             signIn,
             signOut
         }

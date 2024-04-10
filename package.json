@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -12,6 +12,7 @@
     "@kolirt/vue-web3-auth": "^2.3.2",
     "axios": "^1.6.7",
     "firebase": "^10.8.0",
+    "moralis": "^2.25.1",
     "pinia": "^2.1.7",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"

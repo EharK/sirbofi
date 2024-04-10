@@ -1,64 +1,26 @@
 <script setup>
-import {
-  $off,
-  $on,
-  Events,
-  account,
-  connect as masterConnect,
-  disconnect as masterDisconnect,
-} from '@kolirt/vue-web3-auth';
-import { computed, reactive } from 'vue';
-import {useRouter} from "vue-router";
-import {useAuthenticatorStore} from "@/stores/Authenticator.js";
+import connectButtonVue from '@/components/connectButton.vue';
+import OutsideNavbar from "@/components/OutsideNavbar.vue";
 
-const router = useRouter()
-const authStore = useAuthenticatorStore()
-
-const loading = reactive({
-  connecting: false
-})
-
-async function connect(newChain) {
-  const handler = (state) => {
-    if (!state) {
-      loading.connecting = false
-      $off(Events.ModalStateChanged, handler)
-    }
-  }
-
-  $on(Events.ModalStateChanged, handler)
-
-  loading.connecting = true
-  
-  await masterConnect(newChain)
-
-  const connectedHandler = () => {
-    authStore.setUserData(account.address)
-    authStore.setUserLoggedIn(true)
-    router.push('/')
-    $off(Events.Connected, connectedHandler)
-  }
-  $on(Events.Connected, connectedHandler)
-}
-
-async function reconnect(newChain) {
-  if (chain.value.id !== newChain.id) {
-    await masterDisconnect()
-    await masterConnect(newChain)
-  }
+if (!sessionStorage.connected) {
+  localStorage.clear();
 }
 
 </script>
 
 <template>
   <div class="main-container">
-      <div class="top-buttons-wrapper">
-          <router-link to="/subscription">
-        <button>
-            Subscribe
-        </button>
-          </router-link>
+    <OutsideNavbar>
+      <div class="left">
       </div>
+      <div class="right">
+        <router-link to="/subscription">
+          <button>
+            Subscribe
+          </button>
+        </router-link>
+      </div>
+    </OutsideNavbar>
     <div class="login-pad-container">
       <div class="pad login-pad">
         <div class="login-pad-content-wrapper">
@@ -85,66 +47,13 @@ async function reconnect(newChain) {
           </div> -->
 
           <div class="buttons-wrapper">
-            <button @click="connect()">
-              {{ loading.connecting ? 'Connecting...' : 'Connect wallet' }}
-            </button>
-          </div>
-          <div class="buttons-wrapper">
+            <connectButtonVue/>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<!-- <script setup>
-import LoadingSpinner from "@/components/loadingSpinner.vue";
-import {computed, ref} from "vue";
-import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import {useRouter} from "vue-router";
-
-const router = useRouter()
-
-const authStore = useAuthenticatorStore()
-const confirmingUser = computed(() => authStore.confirming_user)
-const auth_loading = ref(false)
-const error_in_authentication = ref(false)
-const creds = ref({
-  email: '',
-  password: ''
-})
-
-function signIn() {
-  error_in_authentication.value = false;
-  auth_loading.value = true
-  authStore.signIn(creds.value.email, creds.value.password)
-      .then(
-          (user) => {
-            if (user && user.data?.uid) {
-              authStore.setUserData(user.data)
-              authStore.setUserLoggedIn(true)
-              router.push('/')
-            } else {
-              error_in_authentication.value = true;
-            }
-          }
-      ).catch(
-      (err) => {
-        console.log(err)
-        error_in_authentication.value = true;
-      }).finally(
-      () => {
-        auth_loading.value = false
-      }
-  )
-}
-
-window.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    signIn()
-  }
-})
-</script> -->
 
 <style scoped>
 
@@ -178,29 +87,6 @@ window.addEventListener('keypress', (e) => {
 
 * {
   text-align: center;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.input-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 40px 0;
-}
-
-.top-buttons-wrapper {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 20px;
 }
 
 .login-pad {
