@@ -13,7 +13,6 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
-    base: '/sirbofi/',
     build: {
         outDir: 'docs',
         assetsDir: '',
