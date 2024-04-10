@@ -5,7 +5,7 @@
         <div :class="{'pad filtering-pad': true, 'hidden': filter_pad_hidden}">
           <div class="filters-container-top-bar">
             <div class="flex column w-full">
-              <button class="toggle-button w-full" :class="{'selected': !filter_pad_hidden}"
+              <button class="toggle-button docking w-full" :class="{'selected': !filter_pad_hidden}"
                       @click="filter_pad_hidden=!filter_pad_hidden">
                 <h2 class="text">{{ filter_pad_hidden ? " << Undocked" : " >> Docked" }}</h2>
               </button>
@@ -840,13 +840,19 @@ button.filter-pad-top-nav-button {
   .filtering-pad.hidden {
     margin-left: 0;
     margin-top: 0;
+    height: max-content;
+    position: relative;
+  }
+
+  .toggle-button.docking {
+    display: none;
   }
 
   .all-ops {
     width: 100%;
     min-width: 0;
     height: max-content;
-    padding: 0;
+    padding: 0 0 200px 0;
     min-height: 0;
   }
 

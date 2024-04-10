@@ -101,8 +101,8 @@ ul {
   flex-direction: column;
   justify-content: center;
   height: 100%;
+  margin-top: -40px;
   gap: 2rem;
-  padding-bottom: 20rem;
 }
 
 .options-container {

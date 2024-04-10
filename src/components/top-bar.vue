@@ -74,10 +74,16 @@ async function signOutHandler(walletAddress) {
 @media (max-width: 1000px) {
   .top-bar-container {
     margin: 0;
-    top: 0;
+    bottom: 0;
     border: 0;
     border-radius: 0;
+    padding: 12px 12px;
+    position: fixed;
+    opacity: 1;
+    width: 100%;
   }
+
+
 }
 
 </style>

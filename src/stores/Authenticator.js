@@ -39,7 +39,7 @@ export const useAuthenticatorStore
         async function getSubscription() {
             const collectionRef = collection(db, 'subscription')
             const q = query(collectionRef)
-                
+
             const querySnapshot = await getDocs(q)
             const items = []
             querySnapshot.forEach(document => {
@@ -84,7 +84,7 @@ export const useAuthenticatorStore
             })
             return formatted;
         }
-        
+
         const signIn = async (walletAddress) => {
             let data = {
                 is_logged_in: false,

@@ -5,6 +5,7 @@ import OutsideNavbar from "@/components/OutsideNavbar.vue";
 if (!sessionStorage.connected) {
   localStorage.clear();
 }
+
 </script>
 
 <template>
@@ -28,6 +29,22 @@ if (!sessionStorage.connected) {
             <path d="M15 110.76L15 240.087L77.4026 239.923L77.4026 110.597L15 110.76Z"/>
             <path d="M85.4026 -0.0802917L85.4026 255.933L147.805 256.097L147.805 0.0834427L85.4026 -0.0802917Z"/>
           </svg>
+          <div class="row">
+            <loading-spinner v-if="confirmingUser"/>
+          </div>
+          <!-- <div class="input-fields" v-if="!confirmingUser">
+            <input type="text" v-model="creds.email" placeholder="Email"/>
+            <input type="password" v-model="creds.password" placeholder="Key"/>
+          </div>
+          <div class="buttons-wrapper" v-if="!confirmingUser">
+            <div class="error" v-if="error_in_authentication">
+              Authentication failed
+            </div>
+            <button @click="signIn" :class="{'disabled': auth_loading}">
+              <loading-spinner v-if="auth_loading"/>
+              Authenticate
+            </button>
+          </div> -->
 
           <div class="buttons-wrapper">
             <connectButtonVue/>
