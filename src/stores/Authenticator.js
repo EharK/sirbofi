@@ -69,10 +69,25 @@ export const useAuthenticatorStore
             const q = query(useRef, where("address", "==", walletAddress));
             const userSnapshot = await getDocs(q);
             const documentID = userSnapshot.docs.map(doc => doc.id)[0];
-            const docRef = doc(db, 'users', documentID);
-            await updateDoc(docRef, {
-                access_status: status
-            });
+            if(!documentID) {
+                const bofiAmount = await getBofiBalance();
+                const newUserRef = doc(collection(db, "users"));
+                const data = {
+                    is_logged_in: true,
+                    access_status: status,
+                    bofiAmount: bofiAmount,
+                    subscription_end: null,
+                    subscription_start: null,
+                    subscription_status: false,
+                    address: walletAddress
+                }
+                await setDoc(newUserRef, data);
+            } else {
+                const docRef = doc(db, 'users', documentID);
+                await updateDoc(docRef, {
+                    access_status: status
+                });
+            }
             if(status)
                 router.push('/');
         }
