@@ -12,10 +12,13 @@ if (!sessionStorage.connected) {
   <div class="main-container">
     <OutsideNavbar>
       <div class="left">
+        <router-link to="/">
+          <img src="/src/assets/SirBofiFullLogo.png" style="max-height: 30px" alt="">
+        </router-link>
       </div>
       <div class="right">
         <router-link to="/subscription">
-          <button>
+          <button class="cta">
             Subscribe
           </button>
         </router-link>
@@ -75,6 +78,7 @@ if (!sessionStorage.connected) {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 }
 
 .login-pad-container {
@@ -90,14 +94,15 @@ if (!sessionStorage.connected) {
 }
 
 .login-pad {
-  width: 400px;
-  height: 400px;
+  width: clamp(60px,24rem, 90vw);
+  height: auto;
+  aspect-ratio: 1/1;
   padding: 20px 40px;
-  margin-top: -100px;
+  margin-bottom: 10vh;
   justify-content: center;
   display: flex;
   flex-direction: column;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.15s ease-in-out;
 }
 
 .buttons-wrapper {

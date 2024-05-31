@@ -28,6 +28,8 @@ import loadingSpinnerVue from './components/loadingSpinner.vue';
   min-height: 100vh;
   background: linear-gradient(135deg, #262626, #0d0d0d);
   color: #cfd6e6;
+  display: flex;
+  flex-direction: column;
 }
 
 .spinner-wrapper {

@@ -80,13 +80,13 @@ html {
 }
 
 h1 {
-    font-size: 48px;
+    font-size: clamp(30px, 4vw, 48px);
     font-weight: 700;
     color: var(--light);
 }
 
 h2 {
-    font-size: 28px;
+    font-size: clamp(20px, 4vw, 28px);
     font-weight: 700;
     color: var(--light);
 }

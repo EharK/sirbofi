@@ -19,32 +19,32 @@
         </ul>
       </div>
       <div class="vr" aria-hidden="true"></div>
-      <div class="payment-wrapper option flex column">
-        <img src="@/assets/icons/logo.ico" alt="sirbofi-logo" style="opacity: 0" width="64px" aria-hidden="true">
+      <div class="payment-wrapper right-side option flex column">
+        <img src="@/assets/icons/logo.ico" alt="sirbofi-logo" width="64px" aria-hidden="true">
         <h2>Welcome to Sir Bofi!</h2>
         <div class="group flex column gap-8">
-          <div>{{ "Period: " }}<span class="text-red">*</span></div>
+          <div>{{ "Choose Period: " }}<span class="text-red">*</span></div>
           <div class="flex row gap-8">
             <button
-              class="toggle-button uppercase"
-              @click="togglePeriodOption(period)"
-              :class="{'selected': period===selected_period}"
-              :key="period"
-              v-for="period in period_options"
+                class="toggle-button uppercase"
+                @click="togglePeriodOption(period)"
+                :class="{'selected': period===selected_period}"
+                :key="period"
+                v-for="period in period_options"
             >
               {{ period + " month" + (period > 1 ? "s" : "") }}
             </button>
           </div>
         </div>
         <div class="group flex column gap-8">
-          <div>Payment currency <span class="text-red">*</span></div>
+          <div>Choose Payment Currency <span class="text-red">*</span></div>
           <div class="flex row gap-8">
             <button
-              class="toggle-button uppercase"
-              @click="togglePaymentOption(opt)"
-              :class="{'selected': opt===selected_payment}"
-              v-for="(opt, key) in payment_options"
-              :key="key"
+                class="toggle-button uppercase"
+                @click="togglePaymentOption(opt)"
+                :class="{'selected': opt===selected_payment}"
+                v-for="(opt, key) in payment_options"
+                :key="key"
             >
               {{ opt }}
             </button>
@@ -57,7 +57,7 @@
               <span class="text-green">{{ account.shortAddress }}</span>
             </div>
             <div v-else>
-              <connectButtonVue />
+              <connectButtonVue/>
             </div>
           </div>
         </div>
@@ -74,7 +74,9 @@
               {{ " " + selected_payment.toUpperCase() }}
             </div>
           </h3>
-          <button class="cta" @click="sendPayment" :disabled="!selected_payment || !selected_period || !account.connected">Send payment</button>
+          <button class="cta" @click="sendPayment"
+                  :disabled="!selected_payment || !selected_period || !account.connected">Send payment
+          </button>
         </div>
       </div>
     </div>
@@ -84,10 +86,10 @@
 <script setup>
 import connectButtonVue from '@/components/connectButton.vue';
 import LoadingSpinner from "@/components/loadingSpinner.vue";
-import { computed, ref } from "vue";
-import { account, sendTransaction, waitForTransaction, erc20ABI, writeContract } from '@kolirt/vue-web3-auth';
+import {computed, ref} from "vue";
+import {account, sendTransaction, waitForTransaction, erc20ABI, writeContract} from '@kolirt/vue-web3-auth';
 import Moralis from 'moralis';
-import { useAuthenticatorStore } from "@/stores/Authenticator.js";
+import {useAuthenticatorStore} from "@/stores/Authenticator.js";
 import OutsideNavbar from "@/components/OutsideNavbar.vue";
 
 const authStore = useAuthenticatorStore();
@@ -110,7 +112,7 @@ const getPrices = async () => {
     const response = await Moralis.EvmApi.token.getMultipleTokenPrices({
       "chain": "0x1",
       "include": "percent_change"
-    },{
+    }, {
       "tokens": [
         {
           "tokenAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
@@ -131,19 +133,19 @@ const getPrices = async () => {
 const tokenPrices = await getPrices();
 
 const amount_to_be_paid = computed(
-  () => selected_period.value * (getSubscription[0]?.monthlyPrice || 0)
+    () => selected_period.value * (getSubscription[0]?.monthlyPrice || 0)
 )
 
 const amount_to_payment = computed(
-  () => {
-    let payment_currency_rate = null;
-    if (selected_payment.value === payment_options.eth) {
-      payment_currency_rate = tokenPrices[0];
-    } else if (selected_payment.value === payment_options.bofi) {
-      payment_currency_rate = tokenPrices[1];
+    () => {
+      let payment_currency_rate = null;
+      if (selected_payment.value === payment_options.eth) {
+        payment_currency_rate = tokenPrices[0];
+      } else if (selected_payment.value === payment_options.bofi) {
+        payment_currency_rate = tokenPrices[1];
+      }
+      return (amount_to_be_paid.value / payment_currency_rate).toPrecision(8)
     }
-    return (amount_to_be_paid.value / payment_currency_rate).toPrecision(8)
-  }
 )
 
 const togglePaymentOption = (option) => {
@@ -156,7 +158,7 @@ const togglePeriodOption = (option) => {
 
 const sendPayment = async () => {
   transactionStatus.value = true;
-  if(selected_payment.value === payment_options.eth) {
+  if (selected_payment.value === payment_options.eth) {
     const tx = await sendTransaction({
       to: import.meta.env.VITE_WALLET_ADDRESS,
       value: Moralis.Core.BigNumber.fromDecimal(amount_to_payment.value, 18)
@@ -204,14 +206,18 @@ const frmtNr = (nr) => {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--slight) 50%, rgba(255, 255, 255, 0) 100%);
 }
 
+.flex.row {
+  flex-wrap: wrap;
+}
+
 .main-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   overflow: auto;
-  font-size: clamp(0.5rem, 1.4vw, 1rem);
+  font-size: clamp(12px, 1.4vw, 16px);
 }
 
 .loading-wrapper {
@@ -228,7 +234,6 @@ const frmtNr = (nr) => {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  height: 80vh;
   gap: 4rem;
   width: 100%;
   padding: 6rem 4rem;
@@ -256,6 +261,57 @@ ul {
 ul li::after {
   content: "•";
   margin-left: 10px;
+}
+
+  .payment-wrapper.right-side img {
+    display: none;
+  }
+
+@media screen and (max-width: 900px) {
+
+  .payment-wrapper.left-side {
+    text-align: right;
+    align-items: flex-end;
+    display: none;
+  }
+
+  .payment-wrapper.right-side img {
+    display: block;
+  }
+
+  .payment-section-sides-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    margin-top: 8vh;
+  }
+
+  .payment-wrapper {
+    width: 100%;
+  }
+
+  .payment-wrapper.left-side {
+    text-align: center;
+    align-items: center;
+  }
+
+  .vr {
+    display: none;
+  }
+
+  ul {
+    padding: 0;
+    margin: 0;
+    line-height: 2;
+    list-style: none;
+  }
+
+  ul li::after {
+    content: "";
+    margin: 0;
+    display: none;
+  }
 }
 
 </style>

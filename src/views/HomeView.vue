@@ -610,12 +610,12 @@ input {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: linear-gradient(180deg, #262626, #151515);
   z-index: 9;
 }
 
 .main-board {
   width: 100%;
+  min-width: 0;
 }
 
 .filtering-pad {
@@ -626,6 +626,15 @@ input {
   border-radius: 0;
   outline: 0;
   transition: margin 0.2s, height 0.2s;
+}
+
+.filters-container-top-bar {
+  position: fixed;
+  padding: 1rem 2rem;
+  border-radius: 4px;
+  width: inherit;
+  backdrop-filter:  blur(10px) brightness(0.4);
+  z-index: 9;
 }
 
 .filtering-pad.hidden {
@@ -640,7 +649,21 @@ input {
 }
 
 .filtering-pad::-webkit-scrollbar {
-  display: block;
+  width: 6px;
+}
+
+.filtering-pad::-webkit-scrollbar-track {
+  background: transparent;
+  margin-top: 112px;
+}
+
+.filtering-pad::-webkit-scrollbar-thumb {
+  background: var(--slight);
+  border-radius: 10px;
+}
+
+.filtering-pad::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .filtering-pad input {
@@ -661,15 +684,6 @@ input {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.filters-container-top-bar {
-  position: fixed;
-  padding: 1rem 2rem;
-  border-radius: 4px;
-  width: inherit;
-  backdrop-filter:  blur(10px) brightness(0.4);
-  z-index: 9;
 }
 
 button.filter-pad-top-nav-button {
@@ -795,7 +809,11 @@ button.filter-pad-top-nav-button {
 
 @media screen and (max-width: 1200px) {
   .all-ops {
-    padding: 0 10px 0 0;
+    padding: 0;
+  }
+
+  .ops-per-crypto {
+    padding: 0 0 0 10px;
   }
 
   .filtering-pad {
@@ -808,10 +826,6 @@ button.filter-pad-top-nav-button {
 
   .text {
     font-size: 12px;
-  }
-
-  .service-container {
-    gap: 10px;
   }
 }
 

@@ -92,8 +92,9 @@ ul {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
   width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .title-and-options {
@@ -101,7 +102,7 @@ ul {
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  margin-top: -40px;
+  margin-top: 12vh;
   gap: 2rem;
 }
 
@@ -112,8 +113,9 @@ ul {
 }
 
 .option.pad {
-  height: 26rem;
+  height: auto;
   width: 26rem;
+  aspect-ratio: 1/1;
   padding: 30px;
   border-radius: 4px;
   transition: all 0.15s;
@@ -125,6 +127,21 @@ ul {
 
 .option.pad .group {
   gap: 1rem;
+}
+
+@media screen and (max-width: 900px) {
+
+  .options-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 200px;
+  }
+
+  .option.pad {
+    max-width: 90vw;
+    padding: 16px;
+  }
 }
 
 </style>
