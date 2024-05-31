@@ -20,7 +20,7 @@ app.use(router)
 
 app.use(
     createWeb3Auth({
-        projectId: '9530ebae553ee2a8259143c9f0c80b91',
+        projectId: 'eacc25e5dfed9f17ac8e020b9b405ead',
         chains: [Chains.mainnet, Chains.bsc, Chains.polygon]
     })
 )
