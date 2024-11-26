@@ -38,7 +38,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthenticatorStore();
-    const connectedAddress = JSON.parse(localStorage.getItem("wagmi.store")).state.data.account;
+    const connectedAddress = JSON.parse(localStorage.getItem("wagmi.store"))?.state.data.account;
     const getUser = await authStore.isUserExist(connectedAddress === undefined ? null : connectedAddress);
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (getUser !== undefined && (getUser.subscription_status || getUser.access_status)) {
