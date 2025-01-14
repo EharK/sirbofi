@@ -14,9 +14,11 @@ const props = defineProps(["howToAccessModalActive"]);
             class="text text-green">minimum of 969 420 $BOFI tokens</span>
           are required. More information at <a class="" href="https://www.sirbofi.com/">sirbofi.com</a></p>
         <div class="flex row gap-8">
-          <button class="cta">
-            Join Sir Bofi
-          </button>
+          <a href="https://app.uniswap.org/explore/tokens/ethereum/0xe3374f14be081eae24e39e18360422b7aa769859">
+            <button class="cta">
+              Join Sir Bofi
+            </button>
+          </a>
         </div>
       </div>
     </div>
@@ -57,7 +59,7 @@ p {
   z-index: 100;
   justify-content: center;
   align-items: center;
-  transition: opacity .2s cubic-bezier(0,0,0,1);
+  transition: opacity .2s cubic-bezier(0, 0, 0, 1);
 }
 
 .how-to-access-modal-container.active {
