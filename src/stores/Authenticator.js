@@ -48,18 +48,19 @@ export const useAuthenticatorStore
             return items
         }
 
-        async function setSubscription(period, walletAddress) {
+        async function setFreeTrial(period, walletAddress) {
+            // This is now used for 1 day free trial
             const endTimestamp = new Date();
-            endTimestamp.setMonth(endTimestamp.getMonth() + period);
+            endTimestamp.setDate(endTimestamp.getDate() + period);
             const useRef = collection(db, 'users');
             const q = query(useRef, where("address", "==", walletAddress));
             const userSnapshot = await getDocs(q);
             const documentID = userSnapshot.docs.map(doc => doc.id)[0];
             const docRef = doc(db, 'users', documentID);
             await updateDoc(docRef, {
-                subscription_end: endTimestamp,
-                subscription_start: serverTimestamp(),
-                subscription_status: true
+                trial_end: endTimestamp,
+                trial_start: serverTimestamp(),
+                trial_status: true
             });
             router.push('/');
         }
@@ -101,15 +102,7 @@ export const useAuthenticatorStore
         }
 
         const signIn = async (walletAddress) => {
-            let data = {
-                is_logged_in: false,
-                access_status: false,
-                bofiAmount: 0,
-                subscription_end: null,
-                subscription_start: null,
-                subscription_status: false,
-                address: null
-            }
+            let data
             const userExists = await isUserExist(walletAddress);
             const bofiAmount = await getBofiBalance();
             if(!userExists) {
@@ -120,6 +113,7 @@ export const useAuthenticatorStore
                     address: walletAddress
                 }
                 await setDoc(newUserRef, data);
+                setFreeTrial()
             } else {
                 const useRef = collection(db, 'users');
                 const q = query(useRef, where("address", "==", walletAddress));
@@ -161,7 +155,7 @@ export const useAuthenticatorStore
             error,
             isUserExist,
             getSubscription,
-            setSubscription,
+            setSubscription: setFreeTrial,
             setAccess,
             getBofiBalance,
             signIn,

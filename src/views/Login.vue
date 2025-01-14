@@ -1,15 +1,20 @@
 <script setup>
 import connectButtonVue from '@/components/connectButton.vue';
 import OutsideNavbar from "@/components/OutsideNavbar.vue";
+import {ref} from "vue";
+import HowToAccessModal from "@/views/HowToAccessModal.vue";
 
 if (!sessionStorage.connected) {
   localStorage.clear();
 }
 
+const howToAccessModalActive = ref(false);
+
 </script>
 
 <template>
   <div class="main-container">
+    <HowToAccessModal @toggle="howToAccessModalActive=!howToAccessModalActive" :howToAccessModalActive="howToAccessModalActive" />
     <OutsideNavbar>
       <div class="left">
         <router-link to="/">
@@ -17,15 +22,13 @@ if (!sessionStorage.connected) {
         </router-link>
       </div>
       <div class="right">
-        <router-link to="/subscription">
-          <button class="cta">
-            Subscribe
-          </button>
-        </router-link>
+        <button class="cta" @click="()=>{ howToAccessModalActive = !howToAccessModalActive }">
+          How To Access
+        </button>
       </div>
     </OutsideNavbar>
     <div class="login-pad-container">
-      <div class="pad login-pad">
+      <div class="pad login-pad relative">
         <div class="login-pad-content-wrapper">
           <svg class="logo" xmlns="http://www.w3.org/2000/svg" width="162" height="256" viewBox="0 0 162 256"
                fill="none">
@@ -35,24 +38,13 @@ if (!sessionStorage.connected) {
           <div class="row">
             <loading-spinner v-if="confirmingUser"/>
           </div>
-          <!-- <div class="input-fields" v-if="!confirmingUser">
-            <input type="text" v-model="creds.email" placeholder="Email"/>
-            <input type="password" v-model="creds.password" placeholder="Key"/>
-          </div>
-          <div class="buttons-wrapper" v-if="!confirmingUser">
-            <div class="error" v-if="error_in_authentication">
-              Authentication failed
-            </div>
-            <button @click="signIn" :class="{'disabled': auth_loading}">
-              <loading-spinner v-if="auth_loading"/>
-              Authenticate
-            </button>
-          </div> -->
-
           <div class="buttons-wrapper">
             <connectButtonVue/>
           </div>
         </div>
+          <button class="bones become-holder" @click="howToAccessModalActive=!howToAccessModalActive">
+            How To Access?
+          </button>
       </div>
     </div>
   </div>
@@ -64,6 +56,18 @@ if (!sessionStorage.connected) {
   color: var(--glow-red);
   font-size: 12px;
   margin: 10px 0;
+}
+
+button.become-holder {
+  border-bottom: 1px solid var(--slight);
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+button.become-holder:hover {
+  border-bottom: 1px solid var(--light-green);
 }
 
 .logo {
@@ -93,22 +97,48 @@ if (!sessionStorage.connected) {
   text-align: center;
 }
 
+@property --var-black {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #1a1a1a;
+}
+
+@property --var-dark {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #2b2b2b;
+}
+
+
+.pad {
+  width: max-content;
+  height: max-content;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  outline: 1px solid var(--dark);
+  background: radial-gradient(100% 100% at 100% 0%, var(--var-dark) 0%, var(--var-black) 100%);
+  border-radius: 8px;
+  transition: all .15s ease-in-out, --var-black .5s cubic-bezier(0,0,0,1), --var-dark .5s cubic-bezier(0,0,0,1);
+}
+
+.pad:hover {
+  --var-dark: var(--light-green);
+}
+
 .login-pad {
-  width: clamp(60px,24rem, 90vw);
-  height: auto;
+  width: clamp(60px, 24rem, 90vw);
   aspect-ratio: 1/1;
-  padding: 20px 40px;
+  padding: 20px 40px 40px;
   margin-bottom: 10vh;
   justify-content: center;
   display: flex;
   flex-direction: column;
-  transition: all 0.15s ease-in-out;
 }
 
 .buttons-wrapper {
   display: flex;
-  flex-direction: row;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
   gap: 10px;
 }
 

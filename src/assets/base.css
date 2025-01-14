@@ -21,8 +21,9 @@ a {
     --light: rgba(207, 214, 230);
     --slight: rgba(230, 230, 230, 0.25);
     --black: #1a1a1a;
-    --light-green: rgba(92, 230, 205, 0.2);
-    --glow-green: #80ff80;
+    --dark: #2a2a2a;
+    --light-green: rgba(110, 235, 110, 0.2);
+    --glow-green: #00ff00;
     --light-red: rgba(230, 92, 92, 0.2);
     --glow-red: #ff8080;
 }
@@ -53,6 +54,10 @@ html {
 
 .gap-8 {
     gap: 0.8rem;
+}
+
+.relative {
+    position: relative;
 }
 
 .row {
@@ -100,12 +105,16 @@ h2 {
 }
 
 .text {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .text.underline {
     text-decoration: underline;
     text-decoration-color: var(--glow-green);
+}
+
+.text a {
+    color: var(--glow-green);
 }
 
 button {
@@ -190,19 +199,10 @@ input {
     outline: none;
     border: none;
     border-bottom: 1px solid var(--light);
-    background-color: #333333;
+    background-color: var(--dark);
     color: var(--light);
     padding: 4px 8px;
     margin-bottom: 10px;
-}
-
-.pad {
-    width: max-content;
-    height: max-content;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    outline: 1px solid rgba(230, 230, 230, 0.25);
-    background-color: #333333;
-    border-radius: 8px;
 }
 
 .disabled {

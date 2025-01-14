@@ -156,34 +156,50 @@
         </div>
       </div>
       <div class="flex column main-board">
-        <top-bar/>
+        <top-bar @toggle-sidebar="filter_pad_hidden=!filter_pad_hidden"/>
         <div class="all-ops">
           <div class="ops-per-crypto" v-for="crypto in Object.keys(opportunities)">
-            <h2 class="crypto-section-title">{{ crypto }}</h2>
-            <div class="op-table-headers">
-              <div class="text exchange-link-header">
-                Buy From
-              </div>
-              <div class="text price-header">
-                Price
-              </div>
-              <div class="text volume-header">
-                24h Volume
-              </div>
-              <div class="text profit-percentage-header">
-                Gap
-              </div>
-              <div class="text volume-header">
-                24h Volume
-              </div>
-              <div class="text price-header">
-                Price
-              </div>
-              <div class="text exchange-link-header">
-                Sell To
+            <div class="title-and-table-headers">
+              <h2 class="crypto-section-title">{{ crypto }}</h2>
+              <div class="op-table-headers">
+                <div class="text exchange-link-header">
+                  Buy From
+                </div>
+                <div class="text price-header">
+                  Price
+                </div>
+                <div class="text volume-header">
+                  24h Volume
+                </div>
+                <div class="text profit-percentage-header">
+                  Gap
+                </div>
+                <div class="text volume-header">
+                  24h Volume
+                </div>
+                <div class="text price-header">
+                  Price
+                </div>
+                <div class="text exchange-link-header">
+                  Sell To
+                </div>
               </div>
             </div>
             <div class="op" v-for="op in opportunities[crypto]">
+              <div class="additional-info-dropdown">
+                <div class="info-line" v-for="infoKey in Object.keys(op.hover_info)">
+                  <div class="title">{{ infoKey }}</div>
+                  <div class="value">
+                    <span class="label">
+                    {{ op.hover_info[infoKey].split(' | ')[0] }}
+                    </span>
+                    -
+                    <span class="label">
+                    {{ op.hover_info[infoKey].split(' | ')[1] }}
+                    </span>
+                  </div>
+                </div>
+              </div>
               <button class="text exchange-link" @click="openInNewTab(op.buy_link)">
                 {{ op.buy_from_exchange }}
               </button>
@@ -476,7 +492,7 @@ async function getAllOpportunities() {
         if (pair.volumeUsd > minimum_trading_volume.value
             && (!filter_by_exchanges.value
                 || selected_exchanges.value.includes(pair.exchangeSlug))
-            && pair.isVerified && !pair.poorAuditStatus
+            && pair.isVerified && !pair.porAuditStatus
         ) {
           filtered_pairs.push(pair)
         }
@@ -506,6 +522,13 @@ async function getAllOpportunities() {
                   sell_to_price: sellToPair.price,
                   sell_to_volume: frmtNr(sellToPair.volumeUsd.toFixed(0)),
                   sell_link: sellToPair.marketUrl,
+                  hover_info: {
+                    "Market Pairs": `${buyFromPair.marketPair} | ${sellToPair.marketPair}`,
+                    "Trading Category": `${buyFromPair.category} | ${sellToPair.category}`,
+                    "Effective Liquidty": `${buyFromPair.effectiveLiquidity?.toFixed(1)} | ${sellToPair.effectiveLiquidity?.toFixed(1)}`,
+                    "Fee Type": `${buyFromPair.feeType} | ${sellToPair.feeType}`,
+                    "Is Verified": `${buyFromPair.isVerified} | ${sellToPair.isVerified}`
+                  }
                 }
             )
             amount_of_opportunities_found.value++
@@ -519,13 +542,13 @@ async function getAllOpportunities() {
           }
         }
         nr_of_market_pairs_checked.value++
-        ops[crypto.slug]?.sort((a, b) => {
-          return b.potential_profit - a.potential_profit
-        })
         if (scraping.value === false) {
           break
         }
       }
+      ops[crypto.slug]?.sort((a, b) => {
+        return b.potential_profit - a.potential_profit
+      })
     })
     opportunities.value = {...ops};
     nr_of_cryptos_checked.value++;
@@ -572,11 +595,11 @@ ul {
 }
 
 .service-container {
-  position: relative;
   display: flex;
   flex-direction: row;
-  width: 100%;
-  height: 100%;
+  padding: 24px;
+  height: 100vh;
+  gap: 24px;
   overflow: hidden;
 }
 
@@ -609,43 +632,53 @@ input {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   z-index: 9;
 }
 
 .main-board {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
+  height: 100%;
   min-width: 0;
 }
 
 .filtering-pad {
+  position: relative;
   width: 400px;
-  height: 100vh;
+  height: 100%;
   overflow: auto;
-  background: linear-gradient(180deg, #262626, #151515);
-  border-radius: 0;
+  background: linear-gradient(45deg, #111, var(--dark));
+  border-radius: 12px;
   outline: 0;
   transition: margin 0.2s, height 0.2s;
+  border: 1px solid #2a2a2a;
+  z-index: 10;
 }
 
 .filters-container-top-bar {
-  position: fixed;
   padding: 1rem 2rem;
-  border-radius: 4px;
-  width: inherit;
-  backdrop-filter:  blur(10px) brightness(0.4);
+  border-radius: 8px;
+  top: 8px;
+  place-self: center;
+  width: 96%;
+  position: sticky;
+  backdrop-filter: blur(10px) brightness(0.4);
   z-index: 9;
 }
 
 .filtering-pad.hidden {
-  margin-left: -380px;
-  height: 80vh;
+  margin-left: -400px;
   position: absolute;
-  border-radius: 0 4px 4px 0;
 }
 
-.filtering-pad.hidden:hover {
-  margin-left: 0;
+
+@media screen and (min-width: 1000px) {
+  .filtering-pad.hidden:hover {
+    margin-left: -24px;
+  }
+
 }
 
 .filtering-pad::-webkit-scrollbar {
@@ -676,7 +709,7 @@ input {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 8rem;
+  margin-top: 24px;
   padding: 1rem 2rem;
 }
 
@@ -706,23 +739,20 @@ button.filter-pad-top-nav-button {
 .all-ops {
   display: flex;
   flex-direction: column;
-  padding: 20px 40px;
-  width: 100%;
-  gap: 60px;
-  min-height: 0;
-  height: calc(100vh - 60px);
-  overflow-y: auto;
-  min-width: 650px;
-}
-
-.ops-per-crypto {
-  display: flex;
-  flex-direction: column;
   padding: 0 40px 40px;
   background-color: var(--black);
+  border: 1px solid var(--dark);
   border-radius: 8px;
   text-align: center;
-  min-height: max-content;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.ops-per-crypto .title-and-table-headers {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  background-color: var(--black);
 }
 
 .crypto-section-title {
@@ -744,12 +774,18 @@ button.filter-pad-top-nav-button {
 }
 
 .op {
+  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
   padding: 12px;
+  border-radius: 8px;
+}
+
+.op:hover {
+  box-shadow: 0 0 2px rgb(0,255,0) inset;
 }
 
 .op .indicator,
@@ -768,7 +804,7 @@ button.filter-pad-top-nav-button {
   background-color: var(--light-green);
   height: 40px;
   border-radius: 4px;
-  pointer-events: none  ;
+  pointer-events: none;
 }
 
 .op .indicator.price,
@@ -789,6 +825,46 @@ button.filter-pad-top-nav-button {
   min-width: 75px;
   width: 180px;
   overflow: hidden;
+}
+
+.op .additional-info-dropdown {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.15s ease-out 0s, visibility 0.15s ease-out 0s;
+  position: absolute;
+  background-color: var(--black);
+  border: 1px solid var(--dark);
+  top: calc(100% - 8px);
+  padding: 20px 30px;
+  width: 500px;
+  max-width: 100%;
+  z-index: 20;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.op .additional-info-dropdown .info-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.op .additional-info-dropdown .value {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.op .additional-info-dropdown .label {
+  padding: 2px 8px;
+  border-radius: 8px;
+  background-color: var(--black);
+}
+
+
+.op:hover .additional-info-dropdown {
+  transition: opacity 0.15s ease-out 1s, visibility 0s ease-out 1s;
+  visibility: visible;
+  opacity: 1;
 }
 
 .filtering-pad-content-wrapper.advanced .advanced-filter-container {
@@ -821,7 +897,7 @@ button.filter-pad-top-nav-button {
   }
 
   .filtering-pad.hidden {
-    margin-left: -320px;
+    margin-left: -340px;
   }
 
   .text {
@@ -832,34 +908,12 @@ button.filter-pad-top-nav-button {
 @media screen and (max-width: 1000px) {
 
   .service-container {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .filters-container {
-    width: 100%;
-    height: max-content;
-    margin-bottom: 50px;
+    gap: 0;
+    padding: 0;
   }
 
   .filtering-pad {
-    width: 100%;
-    height: max-content;
-    border-radius: 0;
-    position: relative;
-    top: 0;
-    margin-left: 0;
-  }
-
-  .filtering-pad.hidden {
-    margin-left: 0;
-    margin-top: 0;
-    height: max-content;
-    position: relative;
-  }
-
-  .toggle-button.docking {
-    display: none;
+    position: absolute;
   }
 
   .all-ops {
@@ -867,14 +921,11 @@ button.filter-pad-top-nav-button {
     min-width: 0;
     height: max-content;
     padding: 0 0 200px 0;
-    min-height: 0;
   }
 
   .ops-per-crypto {
     width: 100%;
     min-width: 0;
-    height: max-content;
-    min-height: 0;
     padding: 0;
     border: 0;
   }

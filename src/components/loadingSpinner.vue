@@ -36,13 +36,13 @@ const custom_thickness = props.thickness
   height: v-bind(custom_size + "px");
   border-radius: 50%;
   border: v-bind(custom_thickness + "px") solid rgba(207, 213, 230, 0.2);
-  border-top-color: #5ce6cd;
+  border-top-color: var(--light);
   animation: spin 1s ease-in-out infinite;
 }
 
 @keyframes spin {
   to {
-    transform: rotate(calc(360deg * 1));
+    transform: rotate(calc(360deg * 2));
   }
 }
 </style>

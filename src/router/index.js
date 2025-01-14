@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import Login from "@/views/Login.vue";
 
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import Subscription from "@/views/Subscription.vue";
+import HowToAccess from "@/views/HowToAccessModal.vue";
 import Payment from "@/views/Payment.vue";
 
 const router = createRouter({
@@ -23,15 +23,10 @@ const router = createRouter({
             component: Login
         },
         {
-            path: '/subscription',
-            name: 'subscription',
-            component: Subscription,
+            path: '/how-to-access',
+            name: 'how-to-access',
+            component: HowToAccess,
         },
-        {
-            path: '/payment',
-            name: 'payment',
-            component: Payment,
-        }
     ]
 })
 

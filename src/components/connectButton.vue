@@ -53,7 +53,7 @@ async function connect(newChain) {
   </div>
   <div v-else>
     <button @click="connect()">
-      {{ loading.connecting ? 'Connecting...' : 'Connect wallet' }}
+      {{ loading.connecting ? 'Connecting...' : 'Connect Wallet' }}
     </button>
   </div>
 </template>

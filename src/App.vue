@@ -26,7 +26,7 @@ import loadingSpinnerVue from './components/loadingSpinner.vue';
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #262626, #0d0d0d);
+  background: linear-gradient(135deg, #111111, #000);
   color: #cfd6e6;
   display: flex;
   flex-direction: column;

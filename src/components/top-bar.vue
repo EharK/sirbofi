@@ -1,8 +1,11 @@
 <template>
   <div class="top-bar-container">
-    <span class="current-user">
+    <div class="flex row gap-8">
+      <button @click="$emit('toggle-sidebar')">Menu</button>
+      <span class="current-user">
       <button>{{ account.shortAddress }}</button>
     </span>
+    </div>
     <span class="buttons-wrapper">
       <button @click="signOutHandler(account.address)">{{ loading.logouting ? 'Logouting...' : 'Log out' }}</button>
     </span>
@@ -11,14 +14,14 @@
 
 <script setup>
 import {useAuthenticatorStore} from "@/stores/Authenticator.js";
-import { account } from '@kolirt/vue-web3-auth';
+import {account} from '@kolirt/vue-web3-auth';
 import {
   $off,
   $on,
   Events,
   disconnect as masterDisconnect
 } from '@kolirt/vue-web3-auth';
-import { reactive } from 'vue';
+import {reactive} from 'vue';
 
 const authStore = useAuthenticatorStore();
 
@@ -51,16 +54,13 @@ async function signOutHandler(walletAddress) {
   justify-content: space-between;
   align-items: center;
   padding: 10px 40px;
-  background-color: #1a1a1a;
+  background-color: var(--black);
   position: sticky;
-  opacity: 0.4;
+  border-radius: 8px;
+  border: 1px solid var(--dark);
   transition: opacity 0.1s ease-in-out;
-  z-index: 100;
   white-space: nowrap;
-}
-
-.top-bar-container:hover {
-  opacity: 1;
+  z-index: 8;
 }
 
 .buttons-wrapper {
